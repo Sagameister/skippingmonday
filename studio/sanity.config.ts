@@ -6,7 +6,7 @@ export default defineConfig({
   name: 'default',
   title: 'Skipping Mondays Studio',
 
-  projectId: 'YOUR_SANITY_PROJECT_ID',
+  projectId: '9mzj9v38',
   dataset: 'production',
 
   plugins: [structureTool()],
