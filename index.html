@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skipping Mondays — Official Site</title>
+
+<!-- Fonts:
+     "Inter Tight" = clean, tightly-spaced headlines (that premium studio look)
+     "Inter"       = easy-to-read body text -->
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   THE LOOK
+   Mimics the Bennett & Clive aesthetic:
+   white page, black text, lots of air, tiny uppercase labels,
+   one huge quiet headline, editorial photo collage.
+   ============================================================ */
+:root{
+  --white: #ffffff;
+  --black: #111111;
+  --gray:  #8a8a8a;          /* for small secondary labels */
+  --line:  #e5e5e5;          /* hairline borders */
+  --cream: #FFF8F0;          /* warm white — text on dark sections */
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+/* NOTE: no `scroll-behavior:smooth` here — the Lenis library
+   takes over ALL scrolling and the two would fight each other */
+
+body{
+  background: var(--white);
+  color: var(--black);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+a{ color: inherit; text-decoration: none; }
+img{ display:block; width:100%; height:100%; object-fit:cover; }
+
+/* ============================================================
+   SPLIT-TEXT MASKS
+   JavaScript wraps every word of a headline in two spans:
+   <span class="w-mask"><span class="w-inner">word</span></span>
+   The outer span is a "letterbox" (overflow:hidden). The inner
+   span starts pushed below it, then slides up into view —
+   so each word appears as if rising out of a slot.
+   ============================================================ */
+.w-mask{
+  display:inline-block;
+  overflow:hidden;              /* the mask: hides whatever is pushed below */
+  vertical-align:top;
+  /* tight line-heights clip letters like g/p/y — this padding trick
+     extends the mask downward without changing the layout */
+  padding-bottom:.22em;   /* room for deep descenders like y, g, p */
+  margin-bottom:-.22em;   /* cancels the padding so layout doesn't shift */
+}
+.w-inner{ display:inline-block; will-change: transform; }
+
+/* the tiny uppercase label style used everywhere on the reference site */
+.micro{
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+
+/* ============================================================
+   HEADER — thin fixed bar: wordmark left, nav + language right
+   ============================================================ */
+header{
+  position: fixed;
+  top:0; left:0; right:0;
+  z-index: 20;
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  padding: 20px 3vw;
+  /* THEME SYSTEM: one variable controls every color in the bar.
+     Default = white (over the hero photo). JS adds .dark once you
+     scroll past the hero, flipping everything to black. */
+  --nav-ink: #fff;          /* text/lines color */
+  --nav-contrast: #111;     /* color used on top of --nav-ink (active pill) */
+  color: var(--nav-ink);
+  transition: color .35s;
+}
+header.dark{
+  --nav-ink: #111;
+  --nav-contrast: #fff;
+}
+header .wordmark{ display:flex; align-items:center; }
+header .wordmark img{
+  height: 44px;          /* controls the logo size — width scales with it */
+  width: auto;
+  display:block;
+  transition: filter .35s;
+}
+/* the SVG file is white; invert(1) flips it to black on light sections */
+header.dark .wordmark img{ filter: invert(1); }
+header nav{ display:flex; align-items:center; gap: 44px; }
+header nav a.nav-link{
+  color: var(--nav-ink);
+  transition: color .35s;
+  font-family:'Inter Tight', sans-serif;
+  /* EXAGGERATED: scales with the screen, 18px → 30px */
+  font-size: clamp(18px, 1.8vw, 30px);
+  font-weight: 600;              /* semi-bold */
+  text-transform: uppercase;     /* ALL CAPS */
+  letter-spacing: -0.02em;       /* tight kerning, matches the headlines */
+  position:relative;
+}
+/* underline that grows on hover — subtle, like the reference */
+header nav a.nav-link::after{
+  content:'';
+  position:absolute;
+  left:0; bottom:-4px;
+  width:0%; height:2px;          /* thicker line for the bolder links */
+  background: var(--nav-ink);
+  transition: width .3s;
+}
+header nav a.nav-link:hover::after{ width:100%; }
+
+/* --- language switcher: shows ONLY the active language.
+       Tapping it drops down the other one; picking that swaps. --- */
+.lang{ position:relative; }
+.lang button{
+  border:1px solid var(--nav-ink);
+  background:transparent;
+  color: var(--nav-ink);
+  transition: color .35s, border-color .35s, background .35s;
+  font-family:'Inter',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.1em;
+  padding: 7px 16px;
+  border-radius: 100px;
+  cursor:pointer;
+}
+.lang-menu{
+  position:absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display:none;                        /* hidden until .lang gets .open */
+}
+.lang.open .lang-menu{ display:block; }
+/* the dropdown uses the theme's INVERSE color as its background,
+   so it's readable over the hero photo AND over white sections */
+.lang-menu button{
+  background: var(--nav-contrast);
+  color: var(--nav-ink);
+}
+
+/* --- burger button (hidden on desktop, shown on tablet/mobile) --- */
+.burger{
+  display:none;                  /* desktop: invisible */
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  width:44px; height:44px;       /* generous tap target */
+  padding:6px;
+}
+.burger span{
+  display:block;
+  width:30px; height:2px;
+  background: var(--nav-ink);
+  margin:9px auto;
+  transition: transform .35s ease, opacity .35s ease;
+}
+/* when open, the two lines rotate into an X */
+.burger.open span:nth-child(1){ transform: translateY(5.5px) rotate(45deg); }
+.burger.open span:nth-child(2){ transform: translateY(-5.5px) rotate(-45deg); }
+
+/* --- the full-screen menu itself --- */
+.menu-overlay{
+  position:fixed; inset:0;
+  z-index:15;                    /* above the page, below the header bar */
+  background:#111;
+  padding: 18vh 6vw 8vh;
+  /* hidden by default (visibility only!). GSAP parks it one
+     screen-height up and slides it like a curtain. IMPORTANT: no
+     CSS transform here — GSAP must own the transform, otherwise
+     the CSS offset and GSAP's offset add up and the menu animates
+     entirely off-screen (that bug already bit us once). */
+  visibility:hidden;
+}
+.menu-links{ display:flex; flex-direction:column; gap:1.5vh; }
+.menu-links a{
+  color:#fff;
+  font-family:'Inter Tight',sans-serif;
+  font-weight:600;
+  text-transform:uppercase;
+  font-size: clamp(3rem, 11vw, 7rem);   /* HUGE stacked links */
+  line-height:1.05;
+  letter-spacing:-0.02em;
+  width:fit-content;
+}
+.menu-links a:hover{ color:#8a8a8a; }
+/* each link sits in a little mask so it can rise in when the menu opens */
+.m-mask{ display:inline-block; overflow:hidden; padding-bottom:.15em; margin-bottom:-.15em; }
+.m-inner{ display:inline-block; }
+
+/* --- NEWS rows: quiet list, echoes the gigs table --- */
+.news-row{
+  display:grid;
+  grid-template-columns: 1fr auto auto;   /* headline | date | arrow */
+  gap: 24px;
+  align-items: center;
+  padding: 26px 0;
+  border-top: 1px solid rgba(255,248,240,.18);
+  transition: opacity .25s;
+}
+.news-row:last-of-type{ border-bottom: 1px solid rgba(255,248,240,.18); }
+/* same editorial trick as gigs: dim the rows you're not on */
+.news-list:hover .news-row{ opacity:.35; }
+.news-list:hover .news-row:hover{ opacity:1; }
+.n-date{ font-size:13px; color:#9a9a9a; }
+.n-title{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+  letter-spacing:-0.02em;
+}
+/* headline rolls must stay on one line (the mask is one line tall) */
+.n-title .roll{ white-space:nowrap; max-width:100%; }
+/* the arrow's sideways letterbox: exactly one arrow wide */
+.n-arrow{
+  font-size: 24px;
+  overflow: hidden;               /* the mask */
+  width: 1.3em;
+}
+.n-arrow .a-inner{
+  display:flex;
+  width: 200%;                    /* two arrows side by side */
+  transform: translateX(-50%);    /* at rest: show the right-hand copy */
+  transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.n-arrow .a-inner span{ flex:0 0 50%; text-align:center; }
+/* hover: the visible arrow exits right, its twin rolls in from the left */
+.news-row:hover .a-inner{ transform: translateX(0); }
+/* --- the cursor-chasing thumbnail preview --- */
+.hover-thumb{
+  position:fixed;
+  top:0; left:0;
+  width: 240px;
+  aspect-ratio: 4/3;
+  overflow:hidden;
+  pointer-events:none;      /* it floats; the rows stay hoverable */
+  z-index:9;
+}
+/* the IMAGE fades/zooms via CSS; the wrapper's position is GSAP's job —
+   keeping the two transforms on separate elements avoids conflicts */
+.hover-thumb img{
+  width:100%; height:100%;
+  object-fit:cover;
+  opacity:0;
+  transform: scale(.85);
+  transition: opacity .35s ease, transform .45s cubic-bezier(0.22,1,0.36,1);
+}
+.hover-thumb.on img{ opacity:1; transform: scale(1); }
+@media (max-width: 1024px){ .hover-thumb{ display:none; } }  /* touch screens: none */
+
+/* the "See all" pill */
+.btn-all{
+  display:inline-block;
+  margin-top: 40px;
+  border:1px solid var(--cream);
+  border-radius:100px;
+  padding: 12px 30px;
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:700;
+  transition: all .25s;
+}
+.btn-all:hover{ background:var(--cream); color:#111; }
+/* the same pill inside the white statement section: black on white */
+.statement .btn-all{ border-color: var(--black); color: var(--black); }
+.statement .btn-all:hover{ background: var(--black); color: var(--cream); }
+
+/* ============================================================
+   TEXT-ROLL HOVER (global)
+   JS wraps eligible link text like this:
+     <span class="roll">              ← the mask (1 line tall)
+       <span class="roll-inner">      ← 2 stacked copies, slides up
+         <span class="roll-line">Text</span>
+         <span class="roll-line">Text</span>
+       </span>
+     </span>
+   On hover the inner column moves up by exactly one line (-50%
+   of its own two-line height): the first copy exits through the
+   top of the mask while the duplicate rises into place. Hover
+   out and the CSS transition plays it backwards. No JS on hover.
+   ============================================================ */
+.roll{
+  display:inline-block;
+  overflow:hidden;               /* the mask */
+  height:1.25em;                 /* exactly one line */
+  line-height:1.25;              /* roomy enough for descenders (y, p, g) */
+  vertical-align:top;
+}
+.roll-inner{
+  display:block;
+  transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);  /* the brand ease */
+}
+.roll-line{ display:block; height:1.25em; }
+.has-roll:hover .roll-inner{ transform: translateY(-50%); }
+/* accessibility: no rolling for reduced-motion users */
+@media (prefers-reduced-motion: reduce){
+  .roll-inner{ transition:none; }
+  .has-roll:hover .roll-inner{ transform:none; }
+}
+
+/* --- MEDIA sub-blocks: "Video" and "Photos" subtitles --- */
+.sub-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin: 100px 0 36px;
+}
+.sub-head.first{ margin-top: 0; }
+.subtitle{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  letter-spacing:-0.02em;
+}
+
+/* --- VIDEO: a straightforward 3-across grid --- */
+.video-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.vid a{ display:block; }
+.v-thumb{
+  position:relative;
+  display:block;
+  aspect-ratio: 16/9;
+  overflow:hidden;
+}
+.v-thumb img{ transition: transform .6s cubic-bezier(0.22,1,0.36,1); }
+.vid:hover .v-thumb img{ transform: scale(1.04); }
+.v-thumb .play{
+  position:absolute;
+  top:50%; left:50%;
+  width:56px; height:56px;
+  margin:-28px 0 0 -28px;
+  border-radius:50%;
+  background: rgba(255,248,240,.92);
+  color:#111;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px;
+}
+.vid figcaption{
+  margin-top:12px;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#9a9a9a;
+}
+
+/* tablet & below: swap links for the burger */
+@media (max-width: 1024px){
+  header nav a.nav-link{ display:none; }
+  .burger{ display:block; }
+  header .wordmark img{ height: 26px; }   /* smaller logo — room to breathe */
+  header nav{ gap: 14px; }
+
+  /* NEWS below 1024px: two-line rows. Top line = index + date,
+     the headline gets the whole second line and may WRAP —
+     rows simply grow taller. (The one-line hover roll is a
+     desktop luxury; these are touch screens anyway.) */
+  .news-row{
+    grid-template-columns: 1fr;   /* date on top, headline below */
+    row-gap: 8px;
+  }
+  .n-title{ grid-column: 1 / -1; grid-row: 2; }  /* full-width line 2 */
+  .n-arrow{ display:none; }
+  /* undo the one-line roll mask so headlines can wrap */
+  .n-title .roll{ height:auto; white-space:normal; }
+  .n-title .roll-line{ height:auto; }
+  .n-title .roll-line + .roll-line{ display:none; }
+}
+
+/* ============================================================
+   HOME / HERO — full-screen photo with cycling song titles,
+   like the reference site's reel with cycling client names
+   ============================================================ */
+.hero{
+  /* PINNED: the hero never scrolls. The page slides up OVER it
+     (see .page-content below), while GSAP gently shrinks it. */
+  position:fixed;
+  top:0; left:0; width:100%;
+  height: 100vh;
+  overflow:hidden;
+  z-index:0;                    /* bottom of the stack */
+}
+/* invisible stand-in that occupies the scroll distance the fixed
+   hero no longer takes up — without it the page would jump */
+.hero-spacer{ height:100vh; }
+/* everything after the hero lives here: solid white and above the
+   hero, so it covers it as it scrolls up */
+.page-content{
+  position:relative;
+  z-index:2;
+  background: var(--white);
+}
+/* SHEET 2: the statement (+ ticker) sticks to the top of the screen
+   once reached — "sticky" means: scroll normally until you hit the
+   top, then stay pinned there. The .cover block then slides over it,
+   exactly like the page slides over the pinned hero. */
+.sheet-statement{
+  position: sticky;
+  top: 0;
+  z-index: 1;                 /* below the cover... */
+  background: var(--white);
+  min-height: 100vh;          /* fill the screen while pinned */
+}
+/* everything from Gigs down: scrolls normally, ON TOP of the sheet.
+   This whole block is DARK — the white statement sheet gets covered
+   by a black card, then the site stays dark to the end. */
+.cover{
+  position: relative;
+  z-index: 3;                 /* ...which slides over the sheet */
+  background: #111;
+  color: var(--cream);
+}
+/* --- dark-theme overrides for everything inside the cover --- */
+.cover .micro{ color: #9a9a9a; }
+.cover .gig{ border-top-color: rgba(255,248,240,.18); }
+.cover .gig:last-of-type{ border-bottom-color: rgba(255,248,240,.18); }
+.cover .g-date,
+.cover .g-note{ color: #9a9a9a; }
+.cover .ph figcaption{ color: #9a9a9a; }
+.cover footer{ border-top-color: rgba(255,248,240,.2); }
+.cover .clock-row{ border-bottom-color: rgba(255,248,240,.18); }
+.cover .clock-row time{ color: #9a9a9a; }
+.cover .foot-grid ul a:hover{ color: #9a9a9a; }
+.cover svg.giant text{ fill: var(--cream); }
+.cover /* --- mailing list signup (footer) --- */
+.newsletter .nl-row{
+  display:flex;
+  align-items:center;
+  border-bottom: 1px solid rgba(255,243,233,.25);
+  transition: border-color .3s;
+}
+.newsletter .nl-row:focus-within{ border-bottom-color: var(--cream); }
+.newsletter input[type="email"]{
+  flex:1;
+  min-width:0;
+  background:transparent;
+  border:none;
+  color: var(--cream);
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  padding: 10px 2px;
+}
+.newsletter input[type="email"]:focus{ outline:none; }
+.newsletter button{
+  background:none;
+  border:none;
+  color: var(--cream);
+  font-size: 20px;
+  cursor:pointer;
+  padding: 0 6px;
+  transition: transform .3s cubic-bezier(0.22,1,0.36,1);
+}
+.newsletter button:hover{ transform: translateX(6px); }
+.nl-note{ margin-top: 12px; font-size:12px; color: #9a9a9a; }
+.form-status{ margin-top: 10px; font-size: 13px; color: #9a9a9a; min-height:1.3em; }
+/* honeypot: off-screen, invisible to humans, irresistible to bots */
+.hp{ position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+
+.legal{ color: #9a9a9a; }
+.cover .legal a:hover{ color: var(--cream); }
+.hero img{ position:absolute; inset:0; }
+/* soft dark wash so white text is readable on any photo */
+.hero::after{
+  content:'';
+  position:absolute; inset:0;
+  /* two washes: one from the bottom (for the rotating info) and
+     one from the top (so the navbar is readable over any photo) */
+  background:
+    linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.05) 45%),
+    linear-gradient(to bottom, rgba(0,0,0,.45), rgba(0,0,0,0) 22%);
+}
+.hero .cycle{
+  position:absolute;
+  left: 3vw; bottom: 5vh;
+  z-index:2;
+  color:#fff;
+}
+.hero .cycle .micro{ color: rgba(255,255,255,.7); margin-bottom: 8px; }
+.hero .cycle .title{
+  font-family:'Inter Tight', sans-serif;
+  font-weight:500;
+  font-size: clamp(2.6rem, 7vw, 6.5rem);   /* bigger, billboard-style */
+  line-height:1.02;
+  letter-spacing:-0.02em;
+  min-height: 1.2em;          /* keeps the layout steady while titles swap */
+}
+
+/* ============================================================
+   STATEMENT — the big quiet headline
+   ("Let's raise your idea." on the reference)
+   ============================================================ */
+.statement{
+  position:relative;
+  padding: 22vh 3vw 14vh;
+}
+#dust-canvas{                  /* subtle three.js particles live back here */
+  position:absolute; inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+.statement .inner{ position:relative; z-index:1; }
+.statement h1{
+  font-family:'Inter Tight', sans-serif;
+  font-weight:500;
+  /* HUGE: scales with the screen, up to 13rem on big monitors */
+  font-size: clamp(3.2rem, 11.5vw, 13rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  margin-bottom: 48px;
+}
+/* each headline line hides inside a "mask" so GSAP can slide it up */
+.statement h1 .line{ display:block; }  /* no overflow:hidden — word masks handle clipping */
+.statement h1 .line span{ display:inline-block; }
+.statement .sub{
+  font-size: 12px;
+  letter-spacing:.16em;
+  text-transform: uppercase;
+  color: var(--black);
+  max-width: 520px;
+  line-height: 1.9;
+}
+
+/* ============================================================
+   TICKER — endless scrolling word strip (services list on
+   the reference site becomes our keywords)
+   ============================================================ */
+.ticker{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  overflow:hidden;
+  white-space:nowrap;
+  padding: 18px 0;
+}
+.ticker .track{ display:inline-block; }
+.ticker span{
+  font-family:'Inter Tight',sans-serif;
+  font-size: 24px;                 /* louder — this is the origin story */
+  font-weight:500;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding-right: 16px;
+  color: var(--gray);
+}
+.ticker span::after{ content:' •'; color: var(--black); padding-left: 12px; }
+
+/* ============================================================
+   SECTION SHELL — shared by Gigs & Media
+   ============================================================ */
+section{ padding: 14vh 3vw; }
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom: 60px;
+}
+.section-head h2{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  /* HUGE section titles too */
+  font-size: clamp(2.8rem, 7.5vw, 8rem);
+  line-height:1;
+  letter-spacing:-0.03em;
+}
+
+/* ============================================================
+   GIGS — quiet table rows with hairlines
+   ============================================================ */
+.gig{
+  display:grid;
+  grid-template-columns: 140px 1fr auto;   /* date | venue | note */
+  gap: 24px;
+  align-items: center;      /* date, venue and note all sit mid-row */
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+  /* announcements, not links: no hover states, no cursor tricks */
+}
+.gig:last-of-type{ border-bottom:1px solid var(--line); }
+.g-date{
+  font-size:13px;
+  color:var(--gray);
+  font-variant-numeric: tabular-nums;   /* digits line up in a column */
+}
+.g-title{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(1.6rem, 3.2vw, 2.8rem);   /* big, matches the news rows */
+  letter-spacing:-0.02em;
+  line-height:1.05;
+}
+.g-note{
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gray);
+}
+
+/* ============================================================
+   MEDIA — video grid + photo slider
+   ============================================================ */
+/* --- PHOTO SLIDER: uniform height, natural widths ---
+   Same recipe as the old filmstrip: every image is the same height
+   and keeps its own aspect ratio, so nothing is cropped. The track
+   is a flex row inside a clipping viewport; JS slides it. */
+.photo-slider{ position:relative; }
+.photo-viewport{ overflow:hidden; }
+.photo-track{
+  display:flex;
+  gap: 20px;
+  width:max-content;          /* as wide as all photos together */
+}
+.photo-track .ph{ flex:0 0 auto; }
+.photo-track .ph img{
+  height: 46vh;               /* the one shared dimension */
+  width: auto;                /* each photo keeps its own ratio */
+  display:block;
+}
+.ph figcaption{
+  margin-top:10px;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gray);
+}
+/* the left / right arrows, floating over the slider edges */
+.slide-btn{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+  z-index:2;
+  width:52px; height:52px;
+  border-radius:50%;
+  border:1px solid var(--cream);
+  background: rgba(17,17,17,.6);
+  color: var(--cream);
+  font-size:20px;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition: background .25s, color .25s;
+}
+.slide-btn:hover{ background: var(--cream); color:#111; }
+.slide-btn.prev{ left: 14px; }
+.slide-btn.next{ right: 14px; }
+
+/* ============================================================
+   CONTACT / FOOTER — city clocks, booking email, socials
+   ============================================================ */
+footer{
+  border-top:1px solid var(--line);
+  padding: 12vh 3vw 40px;
+}
+.foot-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 48px;
+  margin-bottom: 12vh;
+}
+.foot-grid .micro{ margin-bottom: 16px; display:block; }
+.clock-row{
+  display:flex;
+  justify-content:space-between;
+  padding: 8px 0;
+  border-bottom:1px solid var(--line);
+  font-size: 14px;
+}
+.clock-row time{ color: var(--gray); font-variant-numeric: tabular-nums; }
+.foot-grid a.mail{
+  font-family:'Inter Tight',sans-serif;
+  font-size: 19px;
+  font-weight:500;
+}
+.foot-grid a.mail:hover{ text-decoration:underline; }
+.foot-grid ul{ list-style:none; }
+.foot-grid ul li{ padding:6px 0; }
+.foot-grid ul a:hover{ color: var(--gray); }
+
+/* giant wordmark at the very bottom — ALWAYS exactly 100% width.
+   It's an SVG <text>, and SVGs scale like images: the drawing
+   area (viewBox) is 960 units wide, textLength stretches the
+   text to fill all 960, and the SVG itself is width:100%.
+   Result: edge-to-edge on every screen, no JavaScript needed. */
+.giant-wrap{ overflow:hidden; }   /* the "mask" for the reveal animation */
+svg.giant{
+  display:block;
+  width:100%;                     /* fill the row... */
+  height:auto;                    /* ...and keep the proportions */
+}
+svg.giant text{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:600;
+  font-size: 92px;                /* in viewBox units, not screen pixels */
+  fill: var(--black);             /* SVG says "fill", not "color" */
+  user-select:none;
+}
+/* EASTER EGG: the rainbow layer sits on top at opacity 0 and
+   FADES in/out on hover (opacity transitions smoothly; a fill
+   swap can't). The !important-free double-class selector beats
+   the .cover dark-theme fill override. */
+svg.giant .giant-rainbow{
+  fill: url(#rainbow);
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.cover svg.giant .giant-rainbow{ fill: url(#rainbow); }  /* beat the cream override */
+.giant-wrap:hover .giant-rainbow{ opacity: 1; }
+.legal{
+  display:flex;
+  justify-content:space-between;
+  padding-top: 30px;
+  font-size:11px;
+  color:var(--gray);
+}
+.legal a:hover{ color:var(--black); }
+
+/* ============================================================
+   SMALL SCREENS
+   ============================================================ */
+@media (max-width: 760px){
+  header nav{ gap:16px; }
+  header nav a{ font-size:12px; }
+  .gig{ grid-template-columns: 1fr; gap:6px; }
+  .video-grid{ grid-template-columns: 1fr; }
+  /* phones: the slider becomes a plain single column — no arrows,
+     no auto-scroll, every photo full width */
+  .photo-track{ flex-direction:column; width:auto; gap:14px; }
+  .photo-track .ph img{ height:auto; width:100%; }
+  .slide-btn{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header>
+  <!-- the band logo (lives in the Images folder) -->
+  <a class="wordmark" href="#home">
+    <img src="Images/logo-horiz-wht.svg" alt="Skipping Mondays">
+  </a>
+  <nav>
+    <!-- no "Home" link — the logo is the home link -->
+    <a class="nav-link" href="gigs.html"    data-en="Gigs"    data-de="Konzerte">Gigs</a>
+    <a class="nav-link" href="media.html"   data-en="Media"   data-de="Medien">Media</a>
+    <a class="nav-link" href="news.html"    data-en="News"    data-de="Aktuelles">News</a>
+    <a class="nav-link" href="about.html" data-en="About" data-de="Über uns">About</a>
+    <a class="nav-link" href="contact.html" data-en="Contact" data-de="Kontakt">Contact</a>
+    <!-- language switcher: the button shows the CURRENT language;
+         tapping it reveals the other; choosing that one swaps -->
+    <div class="lang">
+      <button id="lang-current" aria-haspopup="true" aria-expanded="false">EN</button>
+      <div class="lang-menu">
+        <button id="lang-opt" data-lang="de">DE</button>
+      </div>
+    </div>
+    <!-- burger: only visible on tablet/mobile (see the media query) -->
+    <button class="burger" aria-label="Open menu">
+      <span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- full-screen menu for tablet/mobile — opened by the burger.
+     It sits OUTSIDE the header so the header's blend-mode
+     doesn't distort it. -->
+<div class="menu-overlay">
+  <nav class="menu-links">
+    <a href="gigs.html"><span class="m-mask"><span class="m-inner" data-en="Gigs" data-de="Konzerte">Gigs</span></span></a>
+    <a href="media.html"><span class="m-mask"><span class="m-inner" data-en="Media" data-de="Medien">Media</span></span></a>
+    <a href="news.html"><span class="m-mask"><span class="m-inner" data-en="News" data-de="Aktuelles">News</span></span></a>
+    <a href="about.html"><span class="m-mask"><span class="m-inner" data-en="About" data-de="Über uns">About</span></span></a>
+    <a href="contact.html"><span class="m-mask"><span class="m-inner" data-en="Contact" data-de="Kontakt">Contact</span></span></a>
+  </nav>
+</div>
+
+<!-- ===================== HOME / HERO ===================== -->
+<div class="hero">
+  <!-- the band's own photo, kept in the Images folder.
+       If it's ever missing, onerror quietly loads a placeholder
+       instead so the site never looks broken. -->
+  <img src="Images/hero.jpg"
+       onerror="this.onerror=null; this.src='https://picsum.photos/seed/stagelights/1920/1200';"
+       alt="Skipping Mondays — soundcheck on stage, view from behind the drum kit">
+  <div class="cycle">
+    <!-- both of these are driven by the rotation in PART 2 of the script;
+         the data attributes keep the DE/EN switcher in sync -->
+    <div class="micro" id="cycle-label" data-en="Upcoming gig" data-de="Nächstes Konzert">Upcoming gig</div>
+    <div class="title" id="cycle-title" data-en="Berlin — Lido · Sep 12" data-de="Berlin — Lido · 12. Sep">Berlin — Lido · Sep 12</div>
+  </div>
+</div>
+
+<!-- scroll stand-in for the pinned hero (also the "Home" anchor) -->
+<div class="hero-spacer" id="home"></div>
+
+<!-- everything from here on scrolls OVER the pinned hero -->
+<div class="page-content">
+
+<!-- SHEET 2: pinned statement — gets covered by the sections below -->
+<div class="sheet-statement" id="about">
+
+<!-- ===================== STATEMENT ===================== -->
+<div class="statement">
+  <canvas id="dust-canvas"></canvas>
+  <div class="inner">
+    <h1>
+      <!-- data-split marks a headline for the mask-reveal treatment;
+           data-split-delay makes the 2nd line start a beat later -->
+      <span class="line"><span data-split data-en="Never on" data-de="Niemals an">Never on</span></span>
+      <span class="line"><span data-split data-split-delay="0.15" data-en="a Monday." data-de="einem Montag.">a Monday.</span></span>
+    </h1>
+    <p class="sub"
+       data-en="Hanoi. New York. Mexico. Germany. One band, four hometowns — warm synths, honest words, loud guitars. The opposite of a Monday."
+       data-de="Hanoi. New York. Mexiko. Deutschland. Eine Band, vier Heimatorte — warme Synths, ehrliche Worte, laute Gitarren. Das Gegenteil von Montag.">
+       Hanoi. New York. Mexico. Germany. One band, four hometowns —
+       warm synths, honest words, loud guitars. The opposite of a Monday.
+    </p>
+    <!-- primary CTA — will lead to the dedicated About page -->
+    <a class="btn-all" href="about.html" data-en="About the Band" data-de="Über die Band">About the Band</a>
+  </div>
+</div>
+
+<!-- ===================== TICKER =====================
+     The band's origin line: four hometowns on repeat.
+     The set appears 3× per half, and the half is doubled —
+     jumping back by exactly one half is invisible, so the
+     loop never shows a seam. aria-hidden because the same
+     info is in the readable bio above. -->
+<div class="ticker" aria-hidden="true">
+  <div class="track" id="ticker-track">
+    <span>Hanoi</span><span>New York</span><span>Mexico</span><span>Germany</span>
+    <span>Hanoi</span><span>New York</span><span>Mexico</span><span>Germany</span>
+    <span>Hanoi</span><span>New York</span><span>Mexico</span><span>Germany</span>
+    <span>Hanoi</span><span>New York</span><span>Mexico</span><span>Germany</span>
+    <span>Hanoi</span><span>New York</span><span>Mexico</span><span>Germany</span>
+    <span>Hanoi</span><span>New York</span><span>Mexico</span><span>Germany</span>
+  </div>
+</div>
+
+</div><!-- /sheet-statement -->
+
+<!-- from here down everything scrolls normally, covering the sheet -->
+<div class="cover">
+
+<!-- ===================== GIGS ===================== -->
+<section id="gigs">
+  <div class="section-head">
+    <h2 data-split data-en="Upcoming Gigs" data-de="Kommende Konzerte">Upcoming Gigs</h2>
+    <div class="micro" data-en="Season 2026" data-de="Saison 2026">Season 2026</div>
+  </div>
+
+  <div class="gigs-list">
+    <!-- each row: date + venue. data-split gives the title the same
+         word-mask scroll reveal as the page's big headlines. -->
+    <div class="gig">
+      <span class="g-date">12.09.2026</span>
+      <div class="g-title" data-split>Berlin — Lido, Kreuzberg</div>
+    </div>
+    <div class="gig">
+      <span class="g-date">19.09.2026</span>
+      <div class="g-title" data-split>Hamburg — Molotow</div>
+    </div>
+    <div class="gig">
+      <span class="g-date">26.09.2026</span>
+      <div class="g-title" data-split>Köln — Gebäude 9</div>
+      <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>
+    </div>
+    <div class="gig">
+      <span class="g-date">03.10.2026</span>
+      <div class="g-title" data-split>München — Strom</div>
+    </div>
+    <div class="gig">
+      <span class="g-date">10.10.2026</span>
+      <div class="g-title" data-split>Wien — Flex</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MEDIA ===================== -->
+<section id="media">
+  <div class="section-head">
+    <h2 data-split data-en="Media" data-de="Medien">Media</h2>
+  </div>
+
+  <!-- ---------- VIDEO: three featured, straightforward grid.
+       (Planned: the Media nav link becomes its own page later —
+       this section is deliberately self-contained for that move.) -->
+  <div class="sub-head first">
+    <h3 class="subtitle" data-split data-en="Video" data-de="Video">Video</h3>
+  </div>
+  <div class="video-grid">
+    <figure class="vid">
+      <a href="#" aria-label="Play: Call In Sad — official video">
+        <span class="v-thumb"><img src="https://picsum.photos/seed/video5/1600/900" alt="Call In Sad — official video still"><span class="play">▶</span></span>
+      </a>
+      <figcaption data-en="“Call In Sad” — Official Video" data-de="„Call In Sad“ — Offizielles Video">“Call In Sad” — Official Video</figcaption>
+    </figure>
+    <figure class="vid">
+      <a href="#" aria-label="Play: Tiny Kitchen Session">
+        <span class="v-thumb"><img src="https://picsum.photos/seed/kitchen/1600/900" alt="Tiny Kitchen Session still"><span class="play">▶</span></span>
+      </a>
+      <figcaption data-en="Tiny Kitchen Session" data-de="Tiny Kitchen Session">Tiny Kitchen Session</figcaption>
+    </figure>
+    <figure class="vid">
+      <a href="#" aria-label="Play: Live at Molotow — full set">
+        <span class="v-thumb"><img src="https://picsum.photos/seed/livefull/1600/900" alt="Live at Molotow full set still"><span class="play">▶</span></span>
+      </a>
+      <figcaption data-en="Live at Molotow — Full Set" data-de="Live im Molotow — Ganzes Set">Live at Molotow — Full Set</figcaption>
+    </figure>
+  </div>
+
+  <!-- ---------- PHOTOS: uniform-height auto-sliding row ---------- -->
+  <div class="sub-head">
+    <h3 class="subtitle" data-split data-en="Photos" data-de="Fotos">Photos</h3>
+  </div>
+  <div class="photo-slider">
+    <button class="slide-btn prev" aria-label="Previous photos">←</button>
+    <div class="photo-viewport">
+      <div class="photo-track">
+        <figure class="ph">
+          <img src="https://picsum.photos/seed/concert1/900/1100" alt="Live show">
+          <figcaption data-en="Live at Molotow, Hamburg" data-de="Live im Molotow, Hamburg">Live at Molotow, Hamburg</figcaption>
+        </figure>
+        <figure class="ph">
+          <img src="https://picsum.photos/seed/studio2/900/900" alt="Studio session">
+          <figcaption data-en="Studio session, Neukölln" data-de="Studio-Session, Neukölln">Studio session, Neukölln</figcaption>
+        </figure>
+        <figure class="ph">
+          <img src="https://picsum.photos/seed/portrait3/900/900" alt="Band portrait">
+          <figcaption data-en="Band portrait, 2026" data-de="Bandporträt, 2026">Band portrait, 2026</figcaption>
+        </figure>
+        <figure class="ph">
+          <img src="https://picsum.photos/seed/crowd4/1200/900" alt="Crowd">
+          <figcaption data-en="The crowd, Gebäude 9" data-de="Das Publikum, Gebäude 9">The crowd, Gebäude 9</figcaption>
+        </figure>
+        <figure class="ph">
+          <img src="https://picsum.photos/seed/backstage/1600/900" alt="Backstage">
+          <figcaption data-en="Backstage, München" data-de="Backstage, München">Backstage, München</figcaption>
+        </figure>
+      </div>
+    </div>
+    <button class="slide-btn next" aria-label="Next photos">→</button>
+  </div>
+
+  <!-- will point to the dedicated Media page once it exists -->
+  <a class="btn-all" href="media.html" data-en="See all media" data-de="Alle Medien ansehen">See all media</a>
+</section>
+
+<!-- ===================== NEWS =====================
+     The latest five headlines. Designed as a self-contained block:
+     when the headless CMS arrives, it just stamps out .news-row
+     items and the reveals/hover states attach automatically. -->
+<section id="news">
+  <div class="section-head">
+    <h2 data-split data-en="News" data-de="Aktuelles">News</h2>
+    <div class="micro" data-en="The latest five" data-de="Die letzten fünf">The latest five</div>
+  </div>
+
+  <div class="news-list">
+    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newsstreams/480/360">
+      <span class="n-title" data-en="“Call In Sad” hits one million streams" data-de="„Call In Sad“ knackt eine Million Streams">“Call In Sad” hits one million streams</span>
+      <span class="n-date">28.06.2026</span>
+      <!-- two arrows in a sideways mask: on hover the visible one
+           exits RIGHT while its twin slides in from the LEFT -->
+      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
+    </a>
+    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newskoeln/480/360">
+      <span class="n-title" data-en="Köln show sold out — second night under discussion" data-de="Köln ausverkauft — zweite Show in Planung">Köln show sold out — second night under discussion</span>
+      <span class="n-date">15.06.2026</span>
+      <!-- two arrows in a sideways mask: on hover the visible one
+           exits RIGHT while its twin slides in from the LEFT -->
+      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
+    </a>
+    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newsstudio/480/360">
+      <span class="n-title" data-en="Studio diary: week one of album two" data-de="Studiotagebuch: Woche eins von Album zwei">Studio diary: week one of album two</span>
+      <span class="n-date">02.06.2026</span>
+      <!-- two arrows in a sideways mask: on hover the visible one
+           exits RIGHT while its twin slides in from the LEFT -->
+      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
+    </a>
+    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newstour/480/360">
+      <span class="n-title" data-en="The No-Alarm Tour announced — five cities" data-de="Die No-Alarm-Tour angekündigt — fünf Städte">The No-Alarm Tour announced — five cities</span>
+      <span class="n-date">21.05.2026</span>
+      <!-- two arrows in a sideways mask: on hover the visible one
+           exits RIGHT while its twin slides in from the LEFT -->
+      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
+    </a>
+    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newsmerch/480/360">
+      <span class="n-title" data-en="New merch: the Snooze Button hoodie" data-de="Neuer Merch: der Snooze-Button-Hoodie">New merch: the Snooze Button hoodie</span>
+      <span class="n-date">09.05.2026</span>
+      <!-- two arrows in a sideways mask: on hover the visible one
+           exits RIGHT while its twin slides in from the LEFT -->
+      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
+    </a>
+  </div>
+
+  <!-- the floating preview that chases the cursor over news rows.
+       ONE shared element for all rows — only its image swaps. -->
+  <div class="hover-thumb" aria-hidden="true"><img src="" alt=""></div>
+
+  <!-- will point to the full news overview page once it exists -->
+  <a class="btn-all" href="news.html" data-en="See all news" data-de="Alle News ansehen">See all news</a>
+</section>
+
+<!-- ===================== CONTACT / FOOTER ===================== -->
+<footer id="contact">
+  <div class="foot-grid">
+
+    <!-- city clocks — updated live by JavaScript, like the reference site -->
+    <div>
+      <span class="micro" data-en="On the road" data-de="Unterwegs">On the road</span>
+      <div class="clock-row"><span>Berlin</span>   <time id="clock-berlin">--:--</time></div>
+      <div class="clock-row"><span>London</span>   <time id="clock-london">--:--</time></div>
+      <div class="clock-row"><span>New York</span> <time id="clock-ny">--:--</time></div>
+    </div>
+
+    <div>
+      <span class="micro" data-en="Booking" data-de="Booking">Booking</span>
+      <a class="mail email-protect" data-user="booking" data-domain="skippingmondays.example">booking [at] skippingmondays.example</a>
+      <p style="margin-top:18px; font-size:13px; color:var(--gray);">
+        <span data-en="Management: Mel Okafor" data-de="Management: Mel Okafor">Management: Mel Okafor</span>
+      </p>
+    </div>
+
+    <div>
+      <span class="micro" data-en="Mailing list" data-de="Newsletter">Mailing list</span>
+      <!-- newsletter signup. TO CONNECT: create a second Formspree
+           form and replace YOUR_NEWSLETTER_ID (see skills.md).
+           Same honeypot trick as the contact form. -->
+      <form class="newsletter" action="https://formspree.io/f/YOUR_NEWSLETTER_ID" method="POST"
+            data-ok-en="You're in! No Monday emails, promise." data-ok-de="Du bist dabei! Keine Montags-Mails, versprochen."
+            data-err-en="That didn't work — try again?" data-err-de="Hat nicht geklappt — nochmal versuchen?"
+            data-off-en="Signup isn't connected yet." data-off-de="Anmeldung ist noch nicht verbunden.">
+        <div class="nl-row">
+          <input type="email" name="email" required placeholder="you@example.com" aria-label="Email address">
+          <button type="submit" aria-label="Subscribe">→</button>
+        </div>
+        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="nl-note" data-en="Gig alerts &amp; new releases. Never on a Monday." data-de="Konzert-Alarm &amp; neue Releases. Nie montags.">Gig alerts &amp; new releases. Never on a Monday.</p>
+        <p class="form-status" role="status"></p>
+      </form>
+    </div>
+    <div>
+      <span class="micro" data-en="Follow" data-de="Folgen">Follow</span>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">Spotify</a></li>
+        <li><a href="#">YouTube</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- the huge wordmark, like an end credit -->
+  <!-- the giant end-credit wordmark:
+       viewBox = the drawing area (960 wide, 78 tall)
+       textLength="960" = stretch the text across the full 960
+       so the text always fills 100% of the width, on any screen -->
+  <div class="giant-wrap">
+    <svg class="giant" viewBox="0 0 960 78" aria-label="Skipping Mondays">
+      <defs>
+        <!-- EASTER EGG: a retro rainbow as CONCENTRIC RINGS.
+             The gradient's center sits BELOW the text, so the color
+             bands cross the letters as gentle arcs — like the corner
+             rainbow on a certain 2026 poster. Doubled stops = crisp
+             bands; spreadMethod="repeat" tiles the rings outward.
+             The two <animate> elements slowly swing the center and
+             breathe the radius, so the arcs drift organically. -->
+        <radialGradient id="rainbow" gradientUnits="userSpaceOnUse"
+                        cx="480" cy="220" r="260" spreadMethod="repeat">
+          <!-- SMOOTH BLEND version: one stop per color = soft gradient.
+               The first color repeats at the end so the rings tile
+               seamlessly. TO REVERT to crisp retro bands, replace
+               these stops with the doubled pairs below:
+               <stop offset="0.000" stop-color="#3D7BE8"/><stop offset="0.143" stop-color="#3D7BE8"/>
+               <stop offset="0.143" stop-color="#A78BE8"/><stop offset="0.286" stop-color="#A78BE8"/>
+               <stop offset="0.286" stop-color="#6B2C91"/><stop offset="0.429" stop-color="#6B2C91"/>
+               <stop offset="0.429" stop-color="#E63B2E"/><stop offset="0.571" stop-color="#E63B2E"/>
+               <stop offset="0.571" stop-color="#F58220"/><stop offset="0.714" stop-color="#F58220"/>
+               <stop offset="0.714" stop-color="#9FBF3B"/><stop offset="0.857" stop-color="#9FBF3B"/>
+               <stop offset="0.857" stop-color="#2E8C7A"/><stop offset="1.000" stop-color="#2E8C7A"/>
+          -->
+          <stop offset="0.000" stop-color="#3D7BE8"/>
+          <stop offset="0.143" stop-color="#A78BE8"/>
+          <stop offset="0.286" stop-color="#6B2C91"/>
+          <stop offset="0.429" stop-color="#E63B2E"/>
+          <stop offset="0.571" stop-color="#F58220"/>
+          <stop offset="0.714" stop-color="#9FBF3B"/>
+          <stop offset="0.857" stop-color="#2E8C7A"/>
+          <stop offset="1.000" stop-color="#3D7BE8"/>
+          <!-- the center (cx/cy) is driven by JavaScript — it lazily
+               chases the cursor. Only the radius still self-animates. -->
+          <animate id="rainbow-anim-r" attributeName="r"
+                   values="260;380;260" dur="8s" repeatCount="indefinite"/>
+        </radialGradient>
+      </defs>
+      <!-- layer 1: the normal wordmark -->
+      <text x="0" y="72" textLength="960" lengthAdjust="spacingAndGlyphs">SKIPPING MONDAYS</text>
+      <!-- layer 2: identical rainbow copy on top, invisible until
+           hover — fading ITS opacity is what makes the color melt
+           in and out (you can't crossfade a fill directly) -->
+      <text class="giant-rainbow" aria-hidden="true"
+            x="0" y="72" textLength="960" lengthAdjust="spacingAndGlyphs">SKIPPING MONDAYS</text>
+    </svg>
+  </div>
+
+  <div class="legal">
+    <span>© 2026 Skipping Mondays</span>
+    <span>
+      <a href="#" data-en="Privacy Policy" data-de="Datenschutz">Privacy Policy</a>
+      &nbsp;·&nbsp;
+      <a href="#" data-en="Imprint" data-de="Impressum">Imprint</a>
+    </span>
+  </div>
+</footer>
+
+</div><!-- /cover -->
+
+</div><!-- /page-content -->
+
+<!-- ===================== LIBRARIES =====================
+     three.js → the 3D dust
+     gsap + ScrollTrigger → animations tied to scrolling
+     lenis → buttery smooth scrolling (the "expensive site" feel) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<!-- CustomEase lets us define the guide's exact easing curve -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.14/lenis.min.js"></script>
+
+<script>
+/* ============================================================
+   MOTION SYSTEM SETUP
+   Values come from the Motion Stack Guide:
+   - one signature ease (soft deceleration, nothing bouncy)
+   - small vertical-only movements (16–24px)
+   - every reveal fires ONCE and stays
+   - respect "prefers reduced motion" (an accessibility must)
+   ============================================================ */
+gsap.registerPlugin(ScrollTrigger, CustomEase);
+
+// the guide's exact easing curve [0.22, 1, 0.36, 1], named "brand"
+CustomEase.create('brand', '0.22, 1, 0.36, 1');
+
+// true if the user asked their OS to minimize animations
+const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============================================================
+   PART 0 — LENIS SMOOTH SCROLL
+   Normal scrolling jumps in steps; Lenis catches your scroll
+   and "glides" the page instead. We also connect it to GSAP's
+   ScrollTrigger so scroll animations stay perfectly in sync.
+   ============================================================ */
+let lenis = null;
+// only smooth-scroll if the library loaded AND the user is okay with motion
+if (window.Lenis && !prefersReduced) {
+  lenis = new Lenis({
+    duration: 1.2,            // how long the glide lasts (higher = floatier)
+    smoothWheel: true         // smooth the mouse wheel too
+  });
+
+  // every time Lenis scrolls, tell ScrollTrigger "we moved!"
+  lenis.on('scroll', ScrollTrigger.update);
+
+  // let GSAP's heartbeat (its "ticker") drive Lenis, so both
+  // libraries share one clock — this prevents stutter
+  gsap.ticker.add((time) => { lenis.raf(time * 1000); });  // Lenis wants milliseconds
+  gsap.ticker.lagSmoothing(0);
+}
+
+/* --- header theme: white over the hero photo, black after it --- */
+const headerEl = document.querySelector('header');
+// the hero is FIXED, so its rectangle never moves — we watch the
+// spacer instead (it scrolls normally, standing in for the hero)
+const heroSpacer = document.querySelector('.hero-spacer');
+
+const coverEl = document.querySelector('.cover');
+
+function updateHeaderTheme(){
+  const probe = 80;   // the height (px) where the navbar text sits
+  // three vertical zones pass under the navbar as you scroll:
+  //   1. dark hero photo      → white navbar
+  //   2. white statement      → black navbar
+  //   3. dark cover sections  → white navbar again
+  const heroBottom = heroSpacer.getBoundingClientRect().bottom;
+  const coverTop   = coverEl.getBoundingClientRect().top;
+  const overStatement = heroBottom < probe && coverTop > probe;
+  headerEl.classList.toggle('dark', overStatement && !menuVisible);
+}
+addEventListener('scroll', updateHeaderTheme, { passive: true });
+addEventListener('resize', updateHeaderTheme);
+
+/* --- burger menu (tablet/mobile) --- */
+const burgerBtn   = document.querySelector('.burger');
+const menuOverlay = document.querySelector('.menu-overlay');
+let menuOpen    = false;   // is the menu logically open?
+let menuVisible = false;   // is the black curtain still on screen? (stays
+                           // true during the closing animation)
+
+function openMenu(){
+  menuOpen = menuVisible = true;
+  burgerBtn.classList.add('open');
+  burgerBtn.setAttribute('aria-label', 'Close menu');
+  if (lenis) lenis.stop();                    // freeze page scrolling behind the menu
+  headerEl.classList.remove('dark');          // white bar over the black menu
+
+  // stop any half-finished open/close animation before starting a new one
+  gsap.killTweensOf([menuOverlay, '.menu-overlay .m-inner']);
+
+  if (prefersReduced){                        // no motion: appear instantly
+    gsap.set(menuOverlay, { yPercent: 0, autoAlpha: 1 });
+    gsap.set('.menu-overlay .m-inner', { yPercent: 0 });
+    return;
+  }
+  // 1. the curtain slides down over the page...
+  gsap.set(menuOverlay, { autoAlpha: 1 });    // make it visible first
+  gsap.to(menuOverlay, { yPercent: 0, duration: .8, ease: 'brand' });
+  // 2. ...then the big links rise out of their masks, one after another
+  gsap.fromTo('.menu-overlay .m-inner',
+    { yPercent: 110 },
+    { yPercent: 0, duration: .9, ease: 'brand', stagger: .08, delay: .3 });
+}
+
+function closeMenu(){
+  if (!menuOpen) return;
+  menuOpen = false;
+  burgerBtn.classList.remove('open');
+  burgerBtn.setAttribute('aria-label', 'Open menu');
+  if (lenis) lenis.start();                   // let the page scroll again
+
+  gsap.killTweensOf([menuOverlay, '.menu-overlay .m-inner']);
+
+  if (prefersReduced){                        // no motion: vanish instantly
+    gsap.set(menuOverlay, { y: 0, yPercent: -100, autoAlpha: 0 });
+    menuVisible = false;
+    updateHeaderTheme();
+    return;
+  }
+  // 1. the links dip back down into their masks (quick)...
+  gsap.to('.menu-overlay .m-inner', {
+    yPercent: 110, duration: .35, ease: 'brand', stagger: .04
+  });
+  // 2. ...then the curtain lifts away, and only THEN do we hide it
+  gsap.to(menuOverlay, {
+    yPercent: -100, duration: .7, ease: 'brand', delay: .15,
+    onComplete: () => {
+      gsap.set(menuOverlay, { autoAlpha: 0 });
+      menuVisible = false;                    // curtain fully gone...
+      updateHeaderTheme();                    // ...now the navbar may flip theme
+    }
+  });
+}
+burgerBtn.addEventListener('click', () => menuOpen ? closeMenu() : openMenu());
+
+// menu links: glide to the section instead of jumping
+document.querySelectorAll('a[href^="#"]').forEach((link) => {
+  link.addEventListener('click', (e) => {
+    const target = link.getAttribute('href');     // e.g. "#gigs"
+    if (target.length > 1) {                      // ignore plain "#" links
+      e.preventDefault();                         // stop the instant jump
+      closeMenu();                                // if the overlay menu is open, shut it
+      if (lenis) {
+        lenis.scrollTo(target, { duration: 1.4 });          // glide there (Lenis)
+      } else {
+        document.querySelector(target)                       // fallback: browser glide
+                .scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+});
+
+/* ============================================================
+   PART 1 — LANGUAGE SWITCHER (DE / EN)
+   How it works: any element that should translate carries two
+   attributes, data-en="..." and data-de="...".
+   Clicking DE or EN copies the right one into the element.
+   ============================================================ */
+function setLang(lang){                      // lang is 'en' or 'de'
+  // find every element that has a data-en attribute...
+  document.querySelectorAll('[data-en]').forEach((el) => {
+    el.textContent = el.dataset[lang];       // ...and swap its text
+  });
+  // swapping text wipes out the word-masks inside headlines AND
+  // the hover-roll wrappers — rebuild both for the new language
+  refreshSplits();
+  buildAllRolls();
+  // switcher: big button shows the NEW language, dropdown offers the other
+  const other = lang === 'en' ? 'de' : 'en';
+  langCurrentBtn.textContent = lang.toUpperCase();
+  langOptBtn.textContent = other.toUpperCase();
+  langOptBtn.dataset.lang = other;
+  langWrap.classList.remove('open');                    // fold the menu away
+  langCurrentBtn.setAttribute('aria-expanded', 'false');
+  document.documentElement.lang = lang;      // good practice for screen readers
+  currentLang = lang;
+  try { localStorage.setItem('sm-lang', lang); } catch(e){}  // remember across pages
+}
+let currentLang = 'en';
+const langWrap       = document.querySelector('.lang');
+const langCurrentBtn = document.getElementById('lang-current');
+const langOptBtn     = document.getElementById('lang-opt');
+
+// tap the visible language → open/close the little dropdown
+langCurrentBtn.addEventListener('click', (e) => {
+  e.stopPropagation();                     // don't let the page click below close it instantly
+  const open = langWrap.classList.toggle('open');
+  langCurrentBtn.setAttribute('aria-expanded', String(open));
+});
+// pick the other language → switch everything
+langOptBtn.addEventListener('click', () => setLang(langOptBtn.dataset.lang));
+// clicking anywhere else closes the dropdown
+addEventListener('click', (e) => {
+  if (!langWrap.contains(e.target)){
+    langWrap.classList.remove('open');
+    langCurrentBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+/* ============================================================
+   PART 2 — ROTATING HERO INFO
+   Cycles through upcoming gigs, new releases, and announcements.
+   Each item has a small label (the type) and a big title, and
+   each carries BOTH languages so the DE/EN switcher always works.
+   ============================================================ */
+const heroItems = [
+  { label: {en:'Upcoming gig',  de:'Nächstes Konzert'},
+    text:  {en:'Berlin — Lido · Sep 12',            de:'Berlin — Lido · 12. Sep'} },
+  { label: {en:'New release',   de:'Neue Single'},
+    text:  {en:'“Call In Sad” — out now',           de:'„Call In Sad“ — jetzt draußen'} },
+  { label: {en:'Announcement',  de:'Ankündigung'},
+    text:  {en:'The No-Alarm Tour — 5 cities',     de:'Die No-Alarm-Tour — 5 Städte'} },
+  { label: {en:'Upcoming gig',  de:'Nächstes Konzert'},
+    text:  {en:'Hamburg — Molotow · Sep 19',        de:'Hamburg — Molotow · 19. Sep'} },
+  { label: {en:'Announcement',  de:'Ankündigung'},
+    text:  {en:'Köln is sold out — danke!',         de:'Köln ist ausverkauft — danke!'} }
+];
+let heroIndex = 0;
+const titleEl     = document.getElementById('cycle-title');
+const heroLabelEl = document.getElementById('cycle-label');
+
+// put one item on screen (optionally with the word-mask animation)
+function renderHeroItem(animated){
+  const item = heroItems[heroIndex];
+  // store both languages ON the elements — setLang() reads these,
+  // so switching DE/EN mid-rotation shows the right text
+  heroLabelEl.dataset.en = item.label.en;  heroLabelEl.dataset.de = item.label.de;
+  titleEl.dataset.en     = item.text.en;   titleEl.dataset.de     = item.text.de;
+
+  heroLabelEl.textContent = item.label[currentLang];
+  titleEl.textContent     = item.text[currentLang];
+
+  if (!animated || prefersReduced) return;    // plain text is enough
+  splitWords(titleEl);                        // wrap each word in a mask
+  gsap.fromTo(titleEl.querySelectorAll('.w-inner'),
+    { yPercent: 110 },                        // start: hidden below the mask
+    { yPercent: 0, duration: .9, ease: 'brand', stagger: .06 });
+}
+
+function nextHeroItem(){
+  heroIndex = (heroIndex + 1) % heroItems.length;   // loop 0,1,2,3,4,0...
+  if (prefersReduced){ renderHeroItem(false); return; }
+  // old words exit UP through the mask, then the new item enters from below
+  gsap.to(titleEl.querySelectorAll('.w-inner'), {
+    yPercent: -110, duration: .5, ease: 'brand', stagger: .04,
+    onComplete: () => renderHeroItem(true)
+  });
+}
+setInterval(nextHeroItem, 4000);   // rotate every 4 seconds — unhurried
+
+/* ============================================================
+   PART 3 — SUBTLE 3D DUST (three.js)
+   A faint field of drifting gray specks behind the headline.
+   Barely there — that's the point on a minimal site.
+   ============================================================ */
+const canvas = document.getElementById('dust-canvas');
+const holder = canvas.parentElement;                     // the .statement block
+
+const scene    = new THREE.Scene();
+const camera   = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+camera.position.z = 10;
+const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+// size the canvas to its section (not the whole window)
+function sizeDust(){
+  const w = holder.clientWidth, h = holder.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+sizeDust();
+addEventListener('resize', sizeDust);
+
+// build ONE cloud of points — much cheaper than many meshes
+const COUNT = 120;
+const positions = new Float32Array(COUNT * 3);           // x,y,z for every speck
+for (let i = 0; i < COUNT; i++){
+  positions[i*3    ] = (Math.random() - 0.5) * 24;       // x
+  positions[i*3 + 1] = (Math.random() - 0.5) * 12;       // y
+  positions[i*3 + 2] = (Math.random() - 0.5) * 6;        // z
+}
+const dustGeo = new THREE.BufferGeometry();
+dustGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const dustMat = new THREE.PointsMaterial({
+  color: 0x999999,        // light gray
+  size: 0.06,
+  transparent: true,
+  opacity: 0.7
+});
+const dust = new THREE.Points(dustGeo, dustMat);
+scene.add(dust);
+
+// gentle drift + a slow lean toward the mouse
+let mx = 0, my = 0;
+addEventListener('mousemove', (e) => {
+  mx = e.clientX / innerWidth  - 0.5;
+  my = e.clientY / innerHeight - 0.5;
+});
+const clock = new THREE.Clock();
+if (prefersReduced) {
+  renderer.render(scene, camera);   // draw the dust once, but don't move it
+} else {
+  (function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    dust.rotation.y = t * 0.02 + mx * 0.15;   // very slow spin
+    dust.rotation.x = my * 0.1;
+    dust.position.y = Math.sin(t * 0.3) * 0.3; // soft up-down breathing
+    renderer.render(scene, camera);
+  })();
+}
+
+/* ============================================================
+   PART 4 — SCROLL & LOAD ANIMATIONS (GSAP)
+   Tuned to the Motion Stack Guide:
+   ease 'brand' · vertical only · once:true · unhurried
+   Headlines use MASK REVEALS: every word rises out of a hidden
+   "slot" (see the .w-mask CSS at the top of the file).
+   ============================================================ */
+
+// --- The split-text engine -------------------------------------
+// Wraps every word of an element in <span class="w-mask"><span class="w-inner">
+function splitWords(el){
+  const words = el.textContent.trim().split(/\s+/);   // "We never play" → 3 words
+  el.innerHTML = '';                                  // empty the element...
+  words.forEach((word, i) => {
+    const mask  = document.createElement('span');     // the letterbox
+    mask.className = 'w-mask';
+    const inner = document.createElement('span');     // the part that moves
+    inner.className = 'w-inner';
+    inner.textContent = word;
+    mask.appendChild(inner);
+    el.appendChild(mask);
+    if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
+  });
+}
+
+const splitEls = gsap.utils.toArray('[data-split]');  // all marked headlines
+
+// (re)build the masks — also called after every language switch
+function refreshSplits(){
+  if (prefersReduced) return;                 // reduced motion: leave plain text
+  splitEls.forEach((el) => {
+    splitWords(el);
+    // headlines that haven't animated yet start hidden below their masks
+    if (!el.classList.contains('revealed')){
+      gsap.set(el.querySelectorAll('.w-inner'), { yPercent: 110 });
+    }
+  });
+}
+
+// slide a headline's words up into view, one after another
+function revealSplit(el){
+  gsap.to(el.querySelectorAll('.w-inner'), {
+    yPercent: 0, duration: 1.2, ease: 'brand', stagger: 0.08,
+    delay: parseFloat(el.dataset.splitDelay || 0),
+    onComplete: () => el.classList.add('revealed')   // remember: already shown
+  });
+}
+
+if (!prefersReduced) {   // skip ALL decorative motion if the user opted out
+
+// build the masks and arm one scroll trigger per headline.
+// The animation targets are looked up at FIRE time (onEnter), so a
+// language switch before the reveal doesn't break anything.
+refreshSplits();
+splitEls.forEach((el) => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%', once: true,
+    onEnter: () => revealSplit(el)
+  });
+});
+
+// --- Pattern 1: hero entrance ---------------------------------
+// photo starts slightly larger and settles at 1.12 — it stays
+// oversized on purpose, so the parallax below never shows gaps
+gsap.fromTo('.hero img', { scale: 1.18 }, { scale: 1.12, duration: 1.4, ease: 'brand' });
+// "Now playing" label: opacity-only, settles at 70% (Pattern 7)
+gsap.fromTo('.hero .cycle .micro', { opacity: 0 }, { opacity: .7, duration: .8, ease: 'brand', delay: .3 });
+gsap.delayedCall(.4, () => renderHeroItem(true));  // first hero item mask-reveals in
+
+// --- Pattern 5: hero parallax — photo drifts while being covered.
+// All hero scroll effects are driven by the SPACER's progress,
+// because the fixed hero itself never moves.
+gsap.to('.hero img', {
+  scrollTrigger: { trigger: '.hero-spacer', start: 'top top', end: 'bottom top', scrub: true },
+  yPercent: 6, ease: 'none'   // the 1.12 oversize gives it room to move
+});
+
+// --- the pinned-hero shrink: as the page slides over the hero,
+// the hero scales down to 92% and gains soft rounded corners,
+// like a card being covered by a sheet of paper
+gsap.to('.hero', {
+  scrollTrigger: { trigger: '.hero-spacer', start: 'top top', end: 'bottom top', scrub: true },
+  scale: 0.92, borderRadius: '28px',
+  filter: 'blur(10px)',       // falls out of focus as it's covered
+  ease: 'none'
+});
+
+// --- same treatment for the pinned statement sheet: while the
+// cover (Gigs onward) rises from the bottom of the screen to the
+// top, the statement scales down behind it
+gsap.to('.sheet-statement', {
+  scrollTrigger: { trigger: '.cover', start: 'top bottom', end: 'top top', scrub: true },
+  scale: 0.94,
+  filter: 'blur(8px)',        // the statement softens as the dark card covers it
+  ease: 'none'
+});
+
+// --- Pattern 2: scroll reveals — fade up, once, then stay ------
+gsap.from('.statement .sub', {
+  scrollTrigger: { trigger: '.statement', start: 'top 80%', once: true },
+  opacity: 0, y: 16, duration: 1, ease: 'brand', delay: .3
+});
+
+// ticker: the strip starts already filling the line edge-to-edge
+// (no empty lead-in) and loops forever at a constant speed.
+const tickerTrack = document.getElementById('ticker-track');
+const TICKER_SPEED = 90;   // pixels per second — lower = calmer
+
+function startTicker(){
+  const half = tickerTrack.scrollWidth / 2;   // width of ONE copy of the list
+  gsap.to(tickerTrack, {
+    x: -half, ease: 'none',                   // jump back by one copy = seamless
+    duration: half / TICKER_SPEED,
+    repeat: -1
+  });
+}
+// fonts change the track's width — measure only after they're ready
+document.fonts.ready.then(startTicker);
+
+// --- Pattern 6: staggered list — gigs cascade in ---------------
+gsap.from('.gig', {
+  scrollTrigger: { trigger: '#gigs', start: 'top 80%', once: true },
+  opacity: 0, y: 16, duration: .9, ease: 'brand', stagger: 0.12
+});
+
+// news headlines: each row watches for ITSELF entering the screen.
+// (One shared trigger on #news proved fragile below the pinned media
+// section — its position shifts as images load and filters change the
+// pin length. A per-row trigger can't go stale: the row fires the
+// moment IT shows up, wherever the layout has moved it.)
+gsap.utils.toArray('.news-row').forEach((row) => {
+  gsap.from(row, {
+    scrollTrigger: { trigger: row, start: 'top 95%', once: true },
+    opacity: 0, y: 16, duration: .9, ease: 'brand'
+  });
+});
+gsap.utils.toArray('.btn-all').forEach((btn) => {
+  gsap.from(btn, {
+    scrollTrigger: { trigger: btn, start: 'top 95%', once: true },
+    opacity: 0, y: 16, duration: .9, ease: 'brand'
+  });
+});
+
+// small section labels: opacity-only, settle at 70% (Pattern 7)
+gsap.utils.toArray('.section-head .micro').forEach((label) => {
+  gsap.fromTo(label, { opacity: 0 }, {
+    scrollTrigger: { trigger: label, start: 'top 85%', once: true },
+    opacity: .7, duration: .8, ease: 'brand'
+  });
+});
+
+// --- MEDIA (Pattern 4): every image opens like a window ---------
+// (applies to photo collage AND video thumbnails, on all screens)
+gsap.utils.toArray('.photo-track .ph img, .video-grid .v-thumb img').forEach((img) => {
+  gsap.fromTo(img,
+    { clipPath: 'inset(20% 20% 20% 20%)', opacity: 0 },
+    {
+      scrollTrigger: { trigger: img, start: 'top 85%', once: true },
+      clipPath: 'inset(0% 0% 0% 0%)', opacity: 1,
+      duration: 1.4, ease: 'brand'   // longer — images are focal points
+    });
+});
+
+// giant wordmark: it's an SVG (not text spans), so it gets one
+// big mask reveal — the whole line rises out of its wrapper
+gsap.from('svg.giant', {
+  scrollTrigger: { trigger: '.giant-wrap', start: 'top 92%', once: true },
+  yPercent: 100, duration: 1.4, ease: 'brand'
+});
+
+}  // end of the reduced-motion guard
+
+/* ============================================================
+   TEXT-ROLL HOVER — builder
+   Wraps the text of every link/button in the two-copy roll
+   structure (see the CSS comment). Runs at load and again after
+   every language switch (which resets elements to plain text).
+   ============================================================ */
+const ROLL_TARGETS = [
+  'header nav a.nav-link',   // top navigation
+  '.menu-links .m-inner',    // burger menu links
+  '.lang button',            // DE / EN pills
+  '.btn-all',                // "See all news"
+  '.news-row .n-title',      // news headlines (rolls on row hover)
+  '.foot-grid ul a',         // social links
+  '.legal a'                 // privacy / imprint
+];
+
+function buildRoll(el){
+  if (el.querySelector('.roll-inner')) return;   // already wrapped
+  const text = el.textContent.trim();
+  if (!text) return;
+  el.textContent = '';                           // clear, then rebuild safely
+  const roll  = document.createElement('span');  roll.className  = 'roll';
+  const inner = document.createElement('span');  inner.className = 'roll-inner';
+  for (let i = 0; i < 2; i++){
+    const line = document.createElement('span');
+    line.className = 'roll-line';
+    line.textContent = text;                     // two identical copies
+    if (i === 1) line.setAttribute('aria-hidden', 'true');  // screen readers read it once
+    inner.appendChild(line);
+  }
+  roll.appendChild(inner);
+  el.appendChild(roll);
+  // hover is detected on the clickable parent (link or button)
+  (el.closest('a,button') || el).classList.add('has-roll');
+}
+
+function buildAllRolls(){
+  document.querySelectorAll(ROLL_TARGETS.join(',')).forEach(buildRoll);
+}
+buildAllRolls();   // wrap everything once on load
+
+// Easter egg housekeeping: if the user prefers reduced motion,
+// remove the rainbow's looping animation — hovering the wordmark
+// then shows a STATIC rainbow instead of a scrolling one
+if (prefersReduced){
+  const a = document.getElementById('rainbow-anim-r');
+  if (a) a.remove();
+}
+
+/* ============================================================
+   EASTER EGG 2.0 — the rainbow's bullseye chases the cursor.
+   Every frame it moves 7% of the remaining distance toward the
+   pointer. Never all the way at once — THAT'S the lag. Leave
+   the wordmark and it drifts home the same way.
+   ============================================================ */
+const rainbowGrad = document.getElementById('rainbow');
+const giantWrap   = document.querySelector('.giant-wrap');
+const giantSvg    = document.querySelector('svg.giant');
+const rainbowPos  = { x: 480, y: 220 };   // where the center IS right now
+const rainbowAim  = { x: 480, y: 220 };   // where it WANTS to be
+
+if (!prefersReduced && rainbowGrad && giantWrap){
+  giantWrap.addEventListener('mousemove', (e) => {
+    // convert screen pixels into the SVG's own 960×78 grid
+    const r = giantSvg.getBoundingClientRect();
+    rainbowAim.x = (e.clientX - r.left) / r.width  * 960;
+    rainbowAim.y = (e.clientY - r.top)  / r.height * 78;
+  });
+  giantWrap.addEventListener('mouseleave', () => {
+    rainbowAim.x = 480;                   // drift back to the resting center
+    rainbowAim.y = 220;
+  });
+  // gsap.ticker = "run this ~60× per second", same clock as everything else
+  gsap.ticker.add(() => {
+    rainbowPos.x += (rainbowAim.x - rainbowPos.x) * 0.035;   // lower = dreamier lag
+    rainbowPos.y += (rainbowAim.y - rainbowPos.y) * 0.035;
+    rainbowGrad.setAttribute('cx', rainbowPos.x);
+    rainbowGrad.setAttribute('cy', rainbowPos.y);
+  });
+}
+
+/* ============================================================
+   NEWS HOVER THUMBNAIL
+   One floating image chases the cursor over the news rows —
+   each frame it covers 12% of the remaining distance (the lag).
+   Entering a row swaps in that row's picture; leaving hides it.
+   ============================================================ */
+const hoverThumb    = document.querySelector('.hover-thumb');
+const hoverThumbImg = hoverThumb.querySelector('img');
+const thumbPos = { x: 0, y: 0 };   // where the preview IS
+const thumbAim = { x: 0, y: 0 };   // where it WANTS to be
+
+if (!prefersReduced && window.matchMedia('(hover: hover)').matches){
+  gsap.ticker.add(() => {
+    thumbPos.x += (thumbAim.x - thumbPos.x) * 0.12;
+    thumbPos.y += (thumbAim.y - thumbPos.y) * 0.12;
+    gsap.set(hoverThumb, { x: thumbPos.x, y: thumbPos.y });
+  });
+
+  document.querySelectorAll('.news-row').forEach((row) => {
+    row.addEventListener('mouseenter', (e) => {
+      hoverThumbImg.src = row.dataset.thumb;      // this row's picture
+      // start AT the cursor so it doesn't fly in from across the page
+      thumbAim.x = thumbPos.x = e.clientX + 32;
+      thumbAim.y = thumbPos.y = e.clientY - 120;
+      hoverThumb.classList.add('on');
+    });
+    row.addEventListener('mousemove', (e) => {
+      thumbAim.x = e.clientX + 32;                // float up-right of the cursor
+      thumbAim.y = e.clientY - 120;
+    });
+    row.addEventListener('mouseleave', () => {
+      hoverThumb.classList.remove('on');          // fade away
+    });
+  });
+}
+
+/* ============================================================
+   PHOTO SLIDER
+   Several photos visible at once; every few seconds the track
+   glides one photo further. Arrows do the same by hand. On
+   phones (≤760px) the CSS stacks everything vertically and this
+   code simply stays dormant.
+   ============================================================ */
+const photoTrack = document.querySelector('.photo-track');
+const photoView  = document.querySelector('.photo-viewport');
+const photoItems = gsap.utils.toArray('.photo-track .ph');
+let slideIndex = 0;
+let slideTimer = null;
+
+const sliderActive = () => window.innerWidth > 760;   // phones: no slider
+
+// the furthest the track can shift before showing empty space
+function maxSlideX(){
+  return Math.max(0, photoTrack.scrollWidth - photoView.clientWidth);
+}
+
+function slideTo(i){
+  if (!sliderActive()) return;
+  const max = maxSlideX();
+  if (max === 0) return;                     // everything already fits
+  // the last photo worth stopping at (further ones would show a gap)
+  let last = photoItems.findIndex((p) => p.offsetLeft >= max);
+  if (last === -1) last = photoItems.length - 1;
+  // wrap around at both ends
+  if (i > last) i = 0;
+  if (i < 0)    i = last;
+  slideIndex = i;
+  const x = Math.min(photoItems[i].offsetLeft, max);
+  gsap.to(photoTrack, {
+    x: -x,
+    duration: prefersReduced ? 0 : 1.1,
+    ease: 'brand'
+  });
+}
+const nextSlide = () => slideTo(slideIndex + 1);
+const prevSlide = () => slideTo(slideIndex - 1);
+
+// auto-advance every 4.5s (not for reduced-motion users)
+function startAuto(){
+  stopAuto();
+  if (prefersReduced || !sliderActive()) return;
+  slideTimer = setInterval(nextSlide, 4500);
+}
+function stopAuto(){
+  if (slideTimer){ clearInterval(slideTimer); slideTimer = null; }
+}
+
+// arrows: slide AND restart the auto timer (so it doesn't fight you)
+document.querySelector('.slide-btn.next').addEventListener('click', () => { nextSlide(); startAuto(); });
+document.querySelector('.slide-btn.prev').addEventListener('click', () => { prevSlide(); startAuto(); });
+
+// pause while the cursor is over the photos — polite, not pushy
+const photoSlider = document.querySelector('.photo-slider');
+photoSlider.addEventListener('mouseenter', stopAuto);
+photoSlider.addEventListener('mouseleave', startAuto);
+
+// window resized across the phone boundary? reset cleanly
+addEventListener('resize', () => {
+  if (!sliderActive()){
+    stopAuto();
+    slideIndex = 0;
+    gsap.set(photoTrack, { x: 0 });
+  } else if (!slideTimer){
+    startAuto();
+  }
+});
+startAuto();
+
+/* ============================================================
+   PART 5 — LIVE CITY CLOCKS (plain JavaScript)
+   Intl.DateTimeFormat can tell the time in any timezone —
+   no math needed, the browser does it all.
+   ============================================================ */
+function cityTime(timeZone){
+  return new Intl.DateTimeFormat('de-DE', {
+    hour: '2-digit', minute: '2-digit', timeZone
+  }).format(new Date());
+}
+function updateClocks(){
+  document.getElementById('clock-berlin').textContent = cityTime('Europe/Berlin');
+  document.getElementById('clock-london').textContent = cityTime('Europe/London');
+  document.getElementById('clock-ny').textContent     = cityTime('America/New_York');
+}
+updateClocks();                  // run immediately
+setInterval(updateClocks, 30000); // refresh every 30 seconds
+
+// newsletter signup: honeypot + "not connected yet" notice + fetch
+// (same recipe as the contact page form — see site.js for details)
+document.querySelectorAll('.newsletter').forEach((form) => {
+  const statusEl = form.querySelector('.form-status');
+  const msg = (key) => form.dataset[key + (currentLang === 'de' ? 'De' : 'En')] || '';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (form.querySelector('[name="_gotcha"]').value) return;   // bot
+    if (form.action.includes('YOUR_')){ statusEl.textContent = msg('off'); return; }
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST', body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok){ form.reset(); statusEl.textContent = msg('ok'); }
+      else       { statusEl.textContent = msg('err'); }
+    } catch (_){ statusEl.textContent = msg('err'); }
+  });
+});
+
+// spam-safe email links: assemble user@domain at load time so the
+// address never appears complete in the HTML source (see site.js)
+document.querySelectorAll('.email-protect').forEach((a) => {
+  const addr = a.dataset.user + '@' + a.dataset.domain;
+  a.textContent = addr;
+  a.setAttribute('href', 'mailto:' + addr);
+});
+
+updateHeaderTheme();             // set the correct navbar theme on load
+
+// restore the language chosen on another page (if any)
+try {
+  const savedLang = localStorage.getItem('sm-lang');
+  if (savedLang && savedLang !== 'en') setLang(savedLang);
+} catch(e){}
+
+// park the menu curtain in its raised position, ready to animate.
+// (translateY(-100%) is in the CSS too — this hands control to GSAP)
+gsap.set(menuOverlay, { y: 0, yPercent: -100, autoAlpha: 0 });
+
+// (The old JS that measured and resized the footer wordmark is gone —
+//  the SVG version scales itself, so no code is needed anymore.)
+</script>
+</body>
+</html>

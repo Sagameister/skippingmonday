@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gigs — Skipping Mondays</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===================== HEADER (shared) ===================== -->
+<header>
+  <a class="wordmark" href="index.html">
+    <img src="Images/logo-horiz-wht.svg" alt="Skipping Mondays">
+  </a>
+  <nav>
+    <a class="nav-link" href="gigs.html"    data-en="Gigs"    data-de="Konzerte">Gigs</a>
+    <a class="nav-link" href="media.html"   data-en="Media"   data-de="Medien">Media</a>
+    <a class="nav-link" href="news.html"    data-en="News"    data-de="Aktuelles">News</a>
+    <a class="nav-link" href="about.html"   data-en="About"   data-de="Über uns">About</a>
+    <a class="nav-link" href="contact.html" data-en="Contact" data-de="Kontakt">Contact</a>
+    <div class="lang">
+      <button id="lang-current" aria-haspopup="true" aria-expanded="false">EN</button>
+      <div class="lang-menu"><button id="lang-opt" data-lang="de">DE</button></div>
+    </div>
+    <button class="burger" aria-label="Open menu"><span></span><span></span></button>
+  </nav>
+</header>
+
+<div class="menu-overlay">
+  <nav class="menu-links">
+    <a href="gigs.html"><span class="m-mask"><span class="m-inner" data-en="Gigs" data-de="Konzerte">Gigs</span></span></a>
+    <a href="media.html"><span class="m-mask"><span class="m-inner" data-en="Media" data-de="Medien">Media</span></span></a>
+    <a href="news.html"><span class="m-mask"><span class="m-inner" data-en="News" data-de="Aktuelles">News</span></span></a>
+    <a href="about.html"><span class="m-mask"><span class="m-inner" data-en="About" data-de="Über uns">About</span></span></a>
+    <a href="contact.html"><span class="m-mask"><span class="m-inner" data-en="Contact" data-de="Kontakt">Contact</span></span></a>
+  </nav>
+</div>
+
+<!-- ===================== PAGE HERO (house rule: dark on top) ===================== -->
+<div class="page-hero">
+  <img src="https://picsum.photos/seed/gigshero/1920/900" alt="Stage lights before the show">
+  <h1 class="page-title" data-split data-en="Gigs" data-de="Konzerte">Gigs</h1>
+</div>
+
+<main class="page-main">
+  <div class="sub-head first">
+    <h3 class="subtitle" data-split data-en="Upcoming" data-de="Demnächst">Upcoming</h3>
+  </div>
+  <div class="gigs-list">
+    <div class="gig" data-reveal>
+      <span class="g-date">12.09.2026</span>
+      <div class="g-title" data-split>Berlin — Lido, Kreuzberg</div>
+    </div>
+    <div class="gig" data-reveal>
+      <span class="g-date">19.09.2026</span>
+      <div class="g-title" data-split>Hamburg — Molotow</div>
+    </div>
+    <div class="gig" data-reveal>
+      <span class="g-date">26.09.2026</span>
+      <div class="g-title" data-split>Köln — Gebäude 9</div>
+      <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>
+    </div>
+    <div class="gig" data-reveal>
+      <span class="g-date">03.10.2026</span>
+      <div class="g-title" data-split>München — Strom</div>
+    </div>
+    <div class="gig" data-reveal>
+      <span class="g-date">10.10.2026</span>
+      <div class="g-title" data-split>Wien — Flex</div>
+    </div>
+  </div>
+
+  <div class="sub-head">
+    <h3 class="subtitle" data-split data-en="Past shows" data-de="Vergangene Shows">Past shows</h3>
+  </div>
+  <div class="gigs-list">
+    <div class="gig past" data-reveal>
+      <span class="g-date">30.05.2026</span>
+      <div class="g-title" data-split>Leipzig — UT Connewitz</div>
+    </div>
+    <div class="gig past" data-reveal>
+      <span class="g-date">17.04.2026</span>
+      <div class="g-title" data-split>Berlin — Badehaus</div>
+    </div>
+    <div class="gig past" data-reveal>
+      <span class="g-date">21.03.2026</span>
+      <div class="g-title" data-split>Dresden — Ostpol</div>
+    </div>
+    <div class="gig past" data-reveal>
+      <span class="g-date">14.02.2026</span>
+      <div class="g-title" data-split>Berlin — Schokoladen</div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== FOOTER (shared) ===================== -->
+<footer>
+  <div class="foot-grid">
+    <div>
+      <span class="micro" data-en="On the road" data-de="Unterwegs">On the road</span>
+      <div class="clock-row"><span>Berlin</span>   <time id="clock-berlin">--:--</time></div>
+      <div class="clock-row"><span>London</span>   <time id="clock-london">--:--</time></div>
+      <div class="clock-row"><span>New York</span> <time id="clock-ny">--:--</time></div>
+    </div>
+    <div>
+      <span class="micro" data-en="Booking" data-de="Booking">Booking</span>
+      <a class="mail email-protect" data-user="booking" data-domain="skippingmondays.example">booking [at] skippingmondays.example</a>
+      <p style="margin-top:18px; font-size:13px; color:var(--muted);">
+        <span data-en="Management: Mel Okafor" data-de="Management: Mel Okafor">Management: Mel Okafor</span>
+      </p>
+    </div>
+    <div>
+      <span class="micro" data-en="Mailing list" data-de="Newsletter">Mailing list</span>
+      <!-- newsletter signup. TO CONNECT: create a second Formspree
+           form and replace YOUR_NEWSLETTER_ID (see skills.md).
+           Same honeypot trick as the contact form. -->
+      <form class="newsletter" action="https://formspree.io/f/YOUR_NEWSLETTER_ID" method="POST"
+            data-ok-en="You're in! No Monday emails, promise." data-ok-de="Du bist dabei! Keine Montags-Mails, versprochen."
+            data-err-en="That didn't work — try again?" data-err-de="Hat nicht geklappt — nochmal versuchen?"
+            data-off-en="Signup isn't connected yet." data-off-de="Anmeldung ist noch nicht verbunden.">
+        <div class="nl-row">
+          <input type="email" name="email" required placeholder="you@example.com" aria-label="Email address">
+          <button type="submit" aria-label="Subscribe">→</button>
+        </div>
+        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="nl-note" data-en="Gig alerts &amp; new releases. Never on a Monday." data-de="Konzert-Alarm &amp; neue Releases. Nie montags.">Gig alerts &amp; new releases. Never on a Monday.</p>
+        <p class="form-status" role="status"></p>
+      </form>
+    </div>
+    <div>
+      <span class="micro" data-en="Follow" data-de="Folgen">Follow</span>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">Spotify</a></li>
+        <li><a href="#">YouTube</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="giant-wrap">
+    <svg class="giant" viewBox="0 0 960 78" aria-label="Skipping Mondays">
+      <defs>
+        <radialGradient id="rainbow" gradientUnits="userSpaceOnUse"
+                        cx="480" cy="220" r="260" spreadMethod="repeat">
+          <stop offset="0.000" stop-color="#3D7BE8"/>
+          <stop offset="0.143" stop-color="#A78BE8"/>
+          <stop offset="0.286" stop-color="#6B2C91"/>
+          <stop offset="0.429" stop-color="#E63B2E"/>
+          <stop offset="0.571" stop-color="#F58220"/>
+          <stop offset="0.714" stop-color="#9FBF3B"/>
+          <stop offset="0.857" stop-color="#2E8C7A"/>
+          <stop offset="1.000" stop-color="#3D7BE8"/>
+          <animate id="rainbow-anim-r" attributeName="r"
+                   values="260;380;260" dur="8s" repeatCount="indefinite"/>
+        </radialGradient>
+      </defs>
+      <text x="0" y="72" textLength="960" lengthAdjust="spacingAndGlyphs">SKIPPING MONDAYS</text>
+      <text class="giant-rainbow" aria-hidden="true"
+            x="0" y="72" textLength="960" lengthAdjust="spacingAndGlyphs">SKIPPING MONDAYS</text>
+    </svg>
+  </div>
+
+  <div class="legal">
+    <span>© 2026 Skipping Mondays</span>
+    <span>
+      <a href="#" data-en="Privacy Policy" data-de="Datenschutz">Privacy Policy</a>
+      &nbsp;·&nbsp;
+      <a href="#" data-en="Imprint" data-de="Impressum">Imprint</a>
+    </span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.14/lenis.min.js"></script>
+<script src="site.js"></script>
+</body>
+</html>

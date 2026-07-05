@@ -1,0 +1,638 @@
+/* ============================================================
+   SKIPPING MONDAYS — shared styles for the interior pages
+   (gigs, media, news, about, contact)
+
+   Interior pages are DARK throughout: dark hero on top (house
+   rule), dark body below, white navbar text always.
+   The homepage (index.html) keeps its own inline styles.
+   ============================================================ */
+
+:root{
+  --white: #ffffff;
+  --black: #111111;
+  --gray:  #8a8a8a;
+  --line:  rgba(255,248,240,.18);   /* hairlines on dark */
+  --cream: #FFF8F0;                 /* warm white text */
+  --muted: #9a9a9a;                 /* secondary text on dark */
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+  background: var(--black);
+  color: var(--cream);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+a{ color: inherit; text-decoration: none; }
+img{ display:block; width:100%; height:100%; object-fit:cover; }
+::selection{ background: var(--cream); color: var(--black); }
+
+.micro{
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ============================================================
+   SPLIT-TEXT MASKS (same engine as the homepage)
+   ============================================================ */
+.w-mask{
+  display:inline-block;
+  overflow:hidden;
+  vertical-align:top;
+  padding-bottom:.22em;    /* room for descenders (y, g, p) */
+  margin-bottom:-.22em;
+}
+.w-inner{ display:inline-block; will-change: transform; }
+
+/* ============================================================
+   HEADER — interior pages are dark, so the bar stays white
+   ============================================================ */
+header{
+  position: fixed;
+  top:0; left:0; right:0;
+  z-index: 20;
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  padding: 20px 3vw;
+  --nav-ink: #fff;
+  --nav-contrast: #111;
+  color: var(--nav-ink);
+}
+header .wordmark{ display:flex; align-items:center; }
+header .wordmark img{ height: 44px; width:auto; display:block; object-fit:contain; }
+header nav{ display:flex; align-items:center; gap: 44px; }
+header nav a.nav-link{
+  color: var(--nav-ink);
+  font-family:'Inter Tight', sans-serif;
+  font-size: clamp(18px, 1.8vw, 30px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  position:relative;
+}
+header nav a.nav-link::after{
+  content:'';
+  position:absolute;
+  left:0; bottom:-4px;
+  width:0%; height:2px;
+  background: var(--nav-ink);
+  transition: width .3s;
+}
+header nav a.nav-link:hover::after{ width:100%; }
+/* the page you're ON keeps a solid underline (set by site.js) */
+header nav a.nav-link.active::after{ width:100%; }
+
+/* --- language switcher: one visible pill + dropdown --- */
+.lang{ position:relative; }
+.lang button{
+  border:1px solid var(--nav-ink);
+  background:transparent;
+  color: var(--nav-ink);
+  font-family:'Inter',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.1em;
+  padding: 7px 16px;
+  border-radius: 100px;
+  cursor:pointer;
+  transition: color .3s, background .3s;
+}
+.lang-menu{
+  position:absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display:none;
+}
+.lang.open .lang-menu{ display:block; }
+.lang-menu button{ background: var(--nav-contrast); color: var(--nav-ink); }
+
+/* --- burger (tablet/mobile) --- */
+.burger{
+  display:none;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  width:44px; height:44px;
+  padding:6px;
+}
+.burger span{
+  display:block;
+  width:30px; height:2px;
+  background: var(--nav-ink);
+  margin:9px auto;
+  transition: transform .35s ease, opacity .35s ease;
+}
+.burger.open span:nth-child(1){ transform: translateY(5.5px) rotate(45deg); }
+.burger.open span:nth-child(2){ transform: translateY(-5.5px) rotate(-45deg); }
+
+.menu-overlay{
+  position:fixed; inset:0;
+  z-index:15;
+  background:#0b0b0b;
+  padding: 18vh 6vw 8vh;
+  visibility:hidden;          /* GSAP slides it like a curtain */
+}
+.menu-links{ display:flex; flex-direction:column; gap:1.5vh; }
+.menu-links a{
+  color:#fff;
+  font-family:'Inter Tight',sans-serif;
+  font-weight:600;
+  text-transform:uppercase;
+  font-size: clamp(3rem, 11vw, 7rem);
+  line-height:1.05;
+  letter-spacing:-0.02em;
+  width:fit-content;
+}
+.menu-links a:hover{ color: var(--muted); }
+.m-mask{ display:inline-block; overflow:hidden; padding-bottom:.15em; margin-bottom:-.15em; }
+.m-inner{ display:inline-block; }
+
+/* ============================================================
+   TEXT-ROLL HOVER (built by site.js)
+   ============================================================ */
+.roll{
+  display:inline-block;
+  overflow:hidden;
+  height:1.25em;
+  line-height:1.25;
+  vertical-align:top;
+}
+.roll-inner{
+  display:block;
+  transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.roll-line{ display:block; height:1.25em; }
+.has-roll:hover .roll-inner{ transform: translateY(-50%); }
+@media (prefers-reduced-motion: reduce){
+  .roll-inner{ transition:none; }
+  .has-roll:hover .roll-inner{ transform:none; }
+}
+
+/* ============================================================
+   PAGE HERO — every page opens dark (house rule)
+   ============================================================ */
+.page-hero{
+  position:relative;
+  height: 62vh;
+  min-height: 420px;
+  display:flex;
+  align-items:flex-end;
+  padding: 0 3vw 6vh;
+  overflow:hidden;
+}
+.page-hero img{ position:absolute; inset:0; z-index:0; }
+.page-hero::after{
+  content:'';
+  position:absolute; inset:0;
+  z-index:1;
+  background:
+    linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,.1) 55%),
+    linear-gradient(to bottom, rgba(0,0,0,.5), rgba(0,0,0,0) 25%);
+}
+.page-title{
+  position:relative;
+  z-index:2;
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(3rem, 10vw, 9rem);
+  line-height:.98;
+  letter-spacing:-0.03em;
+  color:#fff;
+}
+
+/* ============================================================
+   PAGE BODY SHELL
+   ============================================================ */
+.page-main{ padding: 10vh 3vw 14vh; }
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom: 60px;
+}
+.section-head h2{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(2.8rem, 7.5vw, 8rem);
+  line-height:1;
+  letter-spacing:-0.03em;
+}
+.sub-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin: 100px 0 36px;
+}
+.sub-head.first{ margin-top:0; }
+.subtitle{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  letter-spacing:-0.02em;
+}
+
+/* the pill button (dark theme default) */
+.btn-all{
+  display:inline-block;
+  margin-top: 40px;
+  border:1px solid var(--cream);
+  border-radius:100px;
+  padding: 12px 30px;
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:700;
+  transition: all .25s;
+}
+.btn-all:hover{ background:var(--cream); color:#111; }
+
+/* ============================================================
+   GIGS — announcement rows (date | venue | note)
+   ============================================================ */
+.gig{
+  display:grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+}
+.gig:last-of-type{ border-bottom:1px solid var(--line); }
+.g-date{ font-size:13px; color:var(--muted); font-variant-numeric: tabular-nums; }
+.g-title{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+  letter-spacing:-0.02em;
+  line-height:1.05;
+}
+.g-note{
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.gig.past{ opacity:.4; }    /* archive rows are dimmed */
+
+/* ============================================================
+   NEWS PAGE — full articles with a STICKY title column.
+   The left column pins while you read the right column; when
+   the article ends, its own container pushes the title away
+   and the next article's title pins. Pure CSS (position:sticky).
+   ============================================================ */
+.post{
+  display:grid;
+  grid-template-columns: 1fr 1.5fr;   /* pinned title | picture + text */
+  gap: 4vw;
+  padding: 12vh 0;
+  border-top: 1px solid var(--line);
+}
+.post:first-of-type{ border-top:none; padding-top: 2vh; }
+.post-head{
+  position: sticky;        /* scrolls until it hits `top`, then pins */
+  top: 120px;               /* just below the fixed navbar */
+  align-self: start;        /* required — a stretched item can't stick */
+}
+.post-date{
+  font-size: 12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color: var(--muted);
+}
+.post-title{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(2rem, 3.6vw, 3.6rem);
+  line-height:1.02;
+  letter-spacing:-0.02em;
+  margin-top: 14px;
+}
+.post-hero{
+  aspect-ratio: 16/10;
+  overflow:hidden;
+  margin-bottom: 40px;
+}
+.post-body p{
+  max-width: 640px;
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(255,248,240,.85);
+}
+
+/* ============================================================
+   NEWS QUICK-FIND INDEX (top of the news page)
+   ============================================================ */
+.news-index{ max-width: 720px; margin-bottom: 8vh; }
+.news-index .micro{ display:block; margin-bottom: 14px; }
+.index-filter{
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--line);
+  color: var(--cream);
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  padding: 10px 2px;
+  margin-bottom: 10px;
+  border-radius:0;
+  transition: border-color .3s;
+}
+.index-filter:focus{ outline:none; border-bottom-color: var(--cream); }
+.idx-row{
+  display:grid;
+  grid-template-columns: 110px 1fr;
+  gap: 18px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.idx-row:first-of-type{ border-top:none; }
+.idx-date{ font-size:12px; color:var(--muted); font-variant-numeric: tabular-nums; }
+.idx-title{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: 17px;
+  color: rgba(255,248,240,.8);
+  transition: color .25s;
+}
+.idx-row:hover .idx-title{ color: var(--cream); }
+.idx-row.hidden{ display:none; }         /* filtered out by typing */
+
+/* ============================================================
+   MEDIA PAGE — video grid + masonry photo wall
+   ============================================================ */
+.video-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.vid a{ display:block; }
+.v-thumb{
+  position:relative;
+  display:block;
+  aspect-ratio: 16/9;
+  overflow:hidden;
+}
+.v-thumb img{ transition: transform .6s cubic-bezier(0.22,1,0.36,1); }
+.vid:hover .v-thumb img{ transform: scale(1.04); }
+.v-thumb .play{
+  position:absolute;
+  top:50%; left:50%;
+  width:56px; height:56px;
+  margin:-28px 0 0 -28px;
+  border-radius:50%;
+  background: rgba(255,248,240,.92);
+  color:#111;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px;
+}
+.vid figcaption, .photo-wall figcaption{
+  margin-top:12px;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color: var(--muted);
+}
+/* photo wall: CSS columns = easy masonry, natural image ratios */
+.photo-wall{
+  columns: 3;
+  column-gap: 20px;
+}
+.photo-wall figure{
+  break-inside: avoid;      /* never split a photo across columns */
+  margin-bottom: 20px;
+}
+.photo-wall img{ height:auto; }
+
+/* ============================================================
+   ABOUT PAGE — bio, hometown ticker, members
+   ============================================================ */
+.bio-block{ max-width: 760px; }
+.bio-block p{
+  font-size: 17px;
+  line-height: 1.8;
+  color: rgba(255,248,240,.88);
+  margin-bottom: 26px;
+}
+.ticker{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  overflow:hidden;
+  white-space:nowrap;
+  padding: 18px 0;
+  margin: 10vh 0;
+}
+.ticker .track{ display:inline-block; }
+.ticker span{
+  font-family:'Inter Tight',sans-serif;
+  font-size: 24px;
+  font-weight:500;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding-right: 16px;
+  color: var(--muted);
+}
+.ticker span::after{ content:' •'; color: var(--cream); padding-left: 16px; }
+
+.members{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.member .m-photo{ aspect-ratio: 3/4; overflow:hidden; }
+.member .m-photo img{ transition: transform .6s cubic-bezier(0.22,1,0.36,1); }
+.member:hover .m-photo img{ transform: scale(1.04); }
+.member h3{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: 20px;
+  margin-top: 14px;
+}
+.member .micro{ margin-top:4px; display:block; }
+
+/* ============================================================
+   CONTACT PAGE
+   ============================================================ */
+.contact-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 60px;
+}
+.contact-grid .micro{ display:block; margin-bottom: 18px; }
+a.mail-big{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:500;
+  font-size: clamp(1.3rem, 2.6vw, 2.2rem);
+  letter-spacing:-0.01em;
+  word-break: break-all;
+}
+a.mail-big:hover{ text-decoration: underline; }
+.contact-note{ margin-top:16px; font-size:13px; color:var(--muted); }
+
+/* ============================================================
+   CONTACT FORM
+   ============================================================ */
+.contact-form{ max-width: 720px; }
+.form-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.contact-form label{ display:block; margin-bottom: 28px; }
+.contact-form .micro{ display:block; margin-bottom: 10px; }
+.contact-form input,
+.contact-form select,
+.contact-form textarea{
+  width:100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);   /* quiet hairline fields */
+  color: var(--cream);
+  font-family:'Inter',sans-serif;
+  font-size: 16px;
+  padding: 10px 2px;
+  border-radius: 0;
+  transition: border-color .3s;
+}
+.contact-form select{ cursor:pointer; }
+.contact-form select option{ background:#111; color:var(--cream); }
+.contact-form textarea{ resize: vertical; }
+.contact-form input:focus,
+.contact-form select:focus,
+.contact-form textarea:focus{
+  outline: none;
+  border-bottom-color: var(--cream);      /* the line wakes up on focus */
+}
+.contact-form .btn-all{ margin-top: 8px; cursor:pointer; background:transparent; color:var(--cream); font-family:'Inter',sans-serif; }
+.form-status{ margin-top: 18px; font-size: 14px; color: var(--muted); min-height: 1.4em; }
+/* the honeypot: parked far off-screen. Humans never see or reach it
+   (tabindex -1 skips it when tabbing). Bots fill it → busted. */
+.hp{ position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+
+@media (max-width: 760px){
+  .form-row{ grid-template-columns: 1fr; gap: 0; }
+}
+
+/* ============================================================
+   FOOTER (identical on every page)
+   ============================================================ */
+footer{
+  border-top:1px solid var(--line);
+  padding: 12vh 3vw 40px;
+  margin-top: 6vh;
+}
+.foot-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 48px;
+  margin-bottom: 12vh;
+}
+.foot-grid .micro{ margin-bottom: 16px; display:block; }
+.clock-row{
+  display:flex;
+  justify-content:space-between;
+  padding: 8px 0;
+  border-bottom:1px solid var(--line);
+  font-size: 14px;
+}
+.clock-row time{ color: var(--muted); font-variant-numeric: tabular-nums; }
+.foot-grid a.mail{
+  font-family:'Inter Tight',sans-serif;
+  font-size: 19px;
+  font-weight:500;
+}
+.foot-grid a.mail:hover{ text-decoration:underline; }
+.foot-grid ul{ list-style:none; }
+.foot-grid ul li{ padding:6px 0; }
+.foot-grid ul a:hover{ color: var(--muted); }
+
+/* --- mailing list signup --- */
+.newsletter .nl-row{
+  display:flex;
+  align-items:center;
+  border-bottom: 1px solid var(--line);   /* quiet hairline field */
+  transition: border-color .3s;
+}
+.newsletter .nl-row:focus-within{ border-bottom-color: var(--cream); }
+.newsletter input[type="email"]{
+  flex:1;
+  min-width:0;
+  background:transparent;
+  border:none;
+  color: var(--cream);
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  padding: 10px 2px;
+}
+.newsletter input[type="email"]:focus{ outline:none; }
+.newsletter button{
+  background:none;
+  border:none;
+  color: var(--cream);
+  font-size: 20px;
+  cursor:pointer;
+  padding: 0 6px;
+  transition: transform .3s cubic-bezier(0.22,1,0.36,1);
+}
+.newsletter button:hover{ transform: translateX(6px); }
+.nl-note{ margin-top: 12px; font-size:12px; color: var(--muted); }
+
+/* giant wordmark — SVG text scales to exactly 100% width */
+.giant-wrap{ overflow:hidden; }
+svg.giant{ display:block; width:100%; height:auto; }
+svg.giant text{
+  font-family:'Inter Tight',sans-serif;
+  font-weight:600;
+  font-size: 92px;
+  fill: var(--cream);
+  user-select:none;
+}
+svg.giant .giant-rainbow{
+  fill: url(#rainbow);
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.giant-wrap:hover .giant-rainbow{ opacity: 1; }
+
+.legal{
+  display:flex;
+  justify-content:space-between;
+  padding-top: 30px;
+  font-size:11px;
+  color:var(--muted);
+}
+.legal a:hover{ color:var(--cream); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px){
+  header nav a.nav-link{ display:none; }
+  .burger{ display:block; }
+  header .wordmark img{ height: 26px; }
+  header nav{ gap: 14px; }
+
+  /* news: single column, sticky off — title flows with its article */
+  .post{ grid-template-columns: 1fr; gap: 24px; }
+  .post-head{ position: static; }
+
+  .members{ grid-template-columns: repeat(2, 1fr); }
+  .photo-wall{ columns: 2; }
+  .video-grid{ grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px){
+  .gig{ grid-template-columns: 1fr; gap:6px; }
+  .photo-wall{ columns: 1; }
+  .members{ grid-template-columns: 1fr; }
+  .page-hero{ height: 52vh; min-height: 340px; }
+}

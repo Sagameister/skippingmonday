@@ -1,0 +1,17 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Node dependencies
+node_modules/
+dist/
+.astro/
+.sanity/
+dist-studio/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env*.local
