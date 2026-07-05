@@ -294,6 +294,7 @@ header nav a.nav-link.active::after{ width:100%; }
   gap: 4vw;
   padding: 12vh 0;
   border-top: 1px solid var(--line);
+  scroll-margin-top: 140px;
 }
 .post:first-of-type{ border-top:none; padding-top: 2vh; }
 .post-head{
