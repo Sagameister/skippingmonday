@@ -1,14 +1,89 @@
+---
+import Head from '../components/Head.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { sanityClient, urlFor, isSanityConfigured } from '../lib/sanity';
+
+// Check if Sanity is connected
+const hasSanity = isSanityConfigured;
+let heroSongs = [];
+let gigs = [];
+let newsArticles = [];
+let photos = [];
+
+if (hasSanity) {
+  try {
+    heroSongs = await sanityClient.fetch(`*[_type == "song"]`);
+    gigs = await sanityClient.fetch(`*[_type == "gig" && !isPast] | order(date asc)[0..4]`);
+    newsArticles = await sanityClient.fetch(`*[_type == "news"] | order(date desc)[0..4]`);
+    photos = await sanityClient.fetch(`*[_type == "photo" && isFeatured == true]`);
+  } catch (err) {
+    console.error("Sanity fetch homepage data error:", err);
+  }
+}
+
+// Prepare cycling song items for client script
+let formattedSongs = [];
+if (heroSongs && heroSongs.length > 0) {
+  formattedSongs = heroSongs.map(song => ({
+    label: { en: song.categoryEn, de: song.categoryDe },
+    text: { en: song.titleEn, de: song.titleDe }
+  }));
+} else {
+  formattedSongs = [
+    { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Berlin — Lido · Sep 12', de:'Berlin — Lido · 12. Sep'} },
+    { label: {en:'New release',   de:'Neue Single'}, text: {en:'“Call In Sad” — out now', de:'„Call In Sad“ — jetzt draußen'} },
+    { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'The No-Alarm Tour — 5 cities', de:'Die No-Alarm-Tour — 5 Städte'} },
+    { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Hamburg — Molotow · Sep 19', de:'Hamburg — Molotow · 19. Sep'} },
+    { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'Köln is sold out — danke!', de:'Köln ist ausverkauft — danke!'} }
+  ];
+}
+
+// Fallback for gigs
+if (!gigs || gigs.length === 0) {
+  gigs = [
+    { date: '2026-09-12', city: 'Berlin', venue: 'Lido, Kreuzberg', ticketUrl: '#', soldOut: false },
+    { date: '2026-09-19', city: 'Hamburg', venue: 'Molotow', ticketUrl: '#' },
+    { date: '2026-09-26', city: 'Köln', venue: 'Gebäude 9', ticketUrl: '#', soldOut: true },
+    { date: '2026-10-03', city: 'München', venue: 'Strom', ticketUrl: '#' },
+    { date: '2026-10-10', city: 'Wien', venue: 'Flex', ticketUrl: '#' }
+  ];
+}
+
+// Fallback for news
+if (!newsArticles || newsArticles.length === 0) {
+  newsArticles = [
+    { _id: 'post-1', date: '2026-06-28', titleEn: '“Call In Sad” hits one million streams', titleDe: '„Call In Sad“ knackt eine Million Streams', staticThumb: 'https://picsum.photos/seed/newsstreams/480/360' },
+    { _id: 'post-2', date: '2026-06-15', titleEn: 'Köln show sold out — second night under discussion', titleDe: 'Köln ausverkauft — zweite Show in Planung', staticThumb: 'https://picsum.photos/seed/newskoeln/480/360' },
+    { _id: 'post-3', date: '2026-06-02', titleEn: 'Studio diary: week one of album two', titleDe: 'Studiotagebuch: Woche eins von Album zwei', staticThumb: 'https://picsum.photos/seed/newsstudio/480/360' },
+    { _id: 'post-4', date: '2026-05-21', titleEn: 'The No-Alarm Tour announced — five cities', titleDe: 'Die No-Alarm-Tour angekündigt — fünf Städte', staticThumb: 'https://picsum.photos/seed/newstour/480/360' },
+    { _id: 'post-5', date: '2026-05-09', titleEn: 'New merch: the Snooze Button hoodie', titleDe: 'Neuer Merch: der Snooze-Button-Hoodie', staticThumb: 'https://picsum.photos/seed/newsmerch/480/360' }
+  ];
+}
+
+// Fallback for photos
+if (!photos || photos.length === 0) {
+  photos = [
+    { captionEn: 'Live at Molotow, Hamburg', captionDe: 'Live im Molotow, Hamburg', staticImage: 'https://picsum.photos/seed/concert1/900/1100' },
+    { captionEn: 'Studio session, Neukölln', captionDe: 'Studio-Session, Neukölln', staticImage: 'https://picsum.photos/seed/studio2/900/900' },
+    { captionEn: 'Band portrait, 2026', captionDe: 'Bandporträt, 2026', staticImage: 'https://picsum.photos/seed/portrait3/900/900' },
+    { captionEn: 'The crowd, Gebäude 9', captionDe: 'Das Publikum, Gebäude 9', staticImage: 'https://picsum.photos/seed/crowd4/1200/900' },
+    { captionEn: 'Backstage, München', captionDe: 'Backstage, München', staticImage: 'https://picsum.photos/seed/backstage/1600/900' }
+  ];
+}
+
+// Helper to format date to DD.MM.YYYY
+function formatDate(dateStr: string) {
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  }
+  return dateStr;
+}
+---
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skipping Mondays — Official Site</title>
-
-<!-- Fonts:
-     "Inter Tight" = clean, tightly-spaced headlines (that premium studio look)
-     "Inter"       = easy-to-read body text -->
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<Head title="Skipping Mondays — Official Site" loadThree={true} />
 
 <style>
 /* ============================================================
@@ -745,56 +820,15 @@ svg.giant .giant-rainbow{
   .slide-btn{ display:none; }
 }
 </style>
-</head>
 <body>
-
-<!-- ===================== HEADER ===================== -->
-<header>
-  <!-- the band logo (lives in the Images folder) -->
-  <a class="wordmark" href="#home">
-    <img src="Images/logo-horiz-wht.svg" alt="Skipping Mondays">
-  </a>
-  <nav>
-    <!-- no "Home" link — the logo is the home link -->
-    <a class="nav-link" href="gigs.html"    data-en="Gigs"    data-de="Konzerte">Gigs</a>
-    <a class="nav-link" href="media.html"   data-en="Media"   data-de="Medien">Media</a>
-    <a class="nav-link" href="news.html"    data-en="News"    data-de="Aktuelles">News</a>
-    <a class="nav-link" href="about.html" data-en="About" data-de="Über uns">About</a>
-    <a class="nav-link" href="contact.html" data-en="Contact" data-de="Kontakt">Contact</a>
-    <!-- language switcher: the button shows the CURRENT language;
-         tapping it reveals the other; choosing that one swaps -->
-    <div class="lang">
-      <button id="lang-current" aria-haspopup="true" aria-expanded="false">EN</button>
-      <div class="lang-menu">
-        <button id="lang-opt" data-lang="de">DE</button>
-      </div>
-    </div>
-    <!-- burger: only visible on tablet/mobile (see the media query) -->
-    <button class="burger" aria-label="Open menu">
-      <span></span><span></span>
-    </button>
-  </nav>
-</header>
-
-<!-- full-screen menu for tablet/mobile — opened by the burger.
-     It sits OUTSIDE the header so the header's blend-mode
-     doesn't distort it. -->
-<div class="menu-overlay">
-  <nav class="menu-links">
-    <a href="gigs.html"><span class="m-mask"><span class="m-inner" data-en="Gigs" data-de="Konzerte">Gigs</span></span></a>
-    <a href="media.html"><span class="m-mask"><span class="m-inner" data-en="Media" data-de="Medien">Media</span></span></a>
-    <a href="news.html"><span class="m-mask"><span class="m-inner" data-en="News" data-de="Aktuelles">News</span></span></a>
-    <a href="about.html"><span class="m-mask"><span class="m-inner" data-en="About" data-de="Über uns">About</span></span></a>
-    <a href="contact.html"><span class="m-mask"><span class="m-inner" data-en="Contact" data-de="Kontakt">Contact</span></span></a>
-  </nav>
-</div>
+<Header />
 
 <!-- ===================== HOME / HERO ===================== -->
 <div class="hero">
   <!-- the band's own photo, kept in the Images folder.
        If it's ever missing, onerror quietly loads a placeholder
        instead so the site never looks broken. -->
-  <img src="Images/hero.jpg"
+  <img src="/Images/hero.jpg"
        onerror="this.onerror=null; this.src='https://picsum.photos/seed/stagelights/1920/1200';"
        alt="Skipping Mondays — soundcheck on stage, view from behind the drum kit">
   <div class="cycle">
@@ -831,7 +865,7 @@ svg.giant .giant-rainbow{
        warm synths, honest words, loud guitars. The opposite of a Monday.
     </p>
     <!-- primary CTA — will lead to the dedicated About page -->
-    <a class="btn-all" href="about.html" data-en="About the Band" data-de="Über die Band">About the Band</a>
+    <a class="btn-all" href="/about" data-en="About the Band" data-de="Über die Band">About the Band</a>
   </div>
 </div>
 
@@ -865,29 +899,13 @@ svg.giant .giant-rainbow{
   </div>
 
   <div class="gigs-list">
-    <!-- each row: date + venue. data-split gives the title the same
-         word-mask scroll reveal as the page's big headlines. -->
-    <div class="gig">
-      <span class="g-date">12.09.2026</span>
-      <div class="g-title" data-split>Berlin — Lido, Kreuzberg</div>
-    </div>
-    <div class="gig">
-      <span class="g-date">19.09.2026</span>
-      <div class="g-title" data-split>Hamburg — Molotow</div>
-    </div>
-    <div class="gig">
-      <span class="g-date">26.09.2026</span>
-      <div class="g-title" data-split>Köln — Gebäude 9</div>
-      <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>
-    </div>
-    <div class="gig">
-      <span class="g-date">03.10.2026</span>
-      <div class="g-title" data-split>München — Strom</div>
-    </div>
-    <div class="gig">
-      <span class="g-date">10.10.2026</span>
-      <div class="g-title" data-split>Wien — Flex</div>
-    </div>
+    {gigs.map((gig) => (
+      <div class="gig">
+        <span class="g-date">{formatDate(gig.date)}</span>
+        <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
+        {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
+      </div>
+    ))}
   </div>
 </section>
 
@@ -932,33 +950,22 @@ svg.giant .giant-rainbow{
     <button class="slide-btn prev" aria-label="Previous photos">←</button>
     <div class="photo-viewport">
       <div class="photo-track">
-        <figure class="ph">
-          <img src="https://picsum.photos/seed/concert1/900/1100" alt="Live show">
-          <figcaption data-en="Live at Molotow, Hamburg" data-de="Live im Molotow, Hamburg">Live at Molotow, Hamburg</figcaption>
-        </figure>
-        <figure class="ph">
-          <img src="https://picsum.photos/seed/studio2/900/900" alt="Studio session">
-          <figcaption data-en="Studio session, Neukölln" data-de="Studio-Session, Neukölln">Studio session, Neukölln</figcaption>
-        </figure>
-        <figure class="ph">
-          <img src="https://picsum.photos/seed/portrait3/900/900" alt="Band portrait">
-          <figcaption data-en="Band portrait, 2026" data-de="Bandporträt, 2026">Band portrait, 2026</figcaption>
-        </figure>
-        <figure class="ph">
-          <img src="https://picsum.photos/seed/crowd4/1200/900" alt="Crowd">
-          <figcaption data-en="The crowd, Gebäude 9" data-de="Das Publikum, Gebäude 9">The crowd, Gebäude 9</figcaption>
-        </figure>
-        <figure class="ph">
-          <img src="https://picsum.photos/seed/backstage/1600/900" alt="Backstage">
-          <figcaption data-en="Backstage, München" data-de="Backstage, München">Backstage, München</figcaption>
-        </figure>
+        {photos.map((ph) => {
+          const imgUrl = ph.image ? urlFor(ph.image).url() : ph.staticImage;
+          return (
+            <figure class="ph">
+              <img src={imgUrl} alt={ph.captionEn} />
+              <figcaption data-en={ph.captionEn} data-de={ph.captionDe}>{ph.captionEn}</figcaption>
+            </figure>
+          );
+        })}
       </div>
     </div>
     <button class="slide-btn next" aria-label="Next photos">→</button>
   </div>
 
   <!-- will point to the dedicated Media page once it exists -->
-  <a class="btn-all" href="media.html" data-en="See all media" data-de="Alle Medien ansehen">See all media</a>
+  <a class="btn-all" href="/media" data-en="See all media" data-de="Alle Medien ansehen">See all media</a>
 </section>
 
 <!-- ===================== NEWS =====================
@@ -972,41 +979,16 @@ svg.giant .giant-rainbow{
   </div>
 
   <div class="news-list">
-    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newsstreams/480/360">
-      <span class="n-title" data-en="“Call In Sad” hits one million streams" data-de="„Call In Sad“ knackt eine Million Streams">“Call In Sad” hits one million streams</span>
-      <span class="n-date">28.06.2026</span>
-      <!-- two arrows in a sideways mask: on hover the visible one
-           exits RIGHT while its twin slides in from the LEFT -->
-      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
-    </a>
-    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newskoeln/480/360">
-      <span class="n-title" data-en="Köln show sold out — second night under discussion" data-de="Köln ausverkauft — zweite Show in Planung">Köln show sold out — second night under discussion</span>
-      <span class="n-date">15.06.2026</span>
-      <!-- two arrows in a sideways mask: on hover the visible one
-           exits RIGHT while its twin slides in from the LEFT -->
-      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
-    </a>
-    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newsstudio/480/360">
-      <span class="n-title" data-en="Studio diary: week one of album two" data-de="Studiotagebuch: Woche eins von Album zwei">Studio diary: week one of album two</span>
-      <span class="n-date">02.06.2026</span>
-      <!-- two arrows in a sideways mask: on hover the visible one
-           exits RIGHT while its twin slides in from the LEFT -->
-      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
-    </a>
-    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newstour/480/360">
-      <span class="n-title" data-en="The No-Alarm Tour announced — five cities" data-de="Die No-Alarm-Tour angekündigt — fünf Städte">The No-Alarm Tour announced — five cities</span>
-      <span class="n-date">21.05.2026</span>
-      <!-- two arrows in a sideways mask: on hover the visible one
-           exits RIGHT while its twin slides in from the LEFT -->
-      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
-    </a>
-    <a class="news-row" href="#" data-thumb="https://picsum.photos/seed/newsmerch/480/360">
-      <span class="n-title" data-en="New merch: the Snooze Button hoodie" data-de="Neuer Merch: der Snooze-Button-Hoodie">New merch: the Snooze Button hoodie</span>
-      <span class="n-date">09.05.2026</span>
-      <!-- two arrows in a sideways mask: on hover the visible one
-           exits RIGHT while its twin slides in from the LEFT -->
-      <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
-    </a>
+    {newsArticles.map((article) => {
+      const thumbUrl = article.coverImage ? urlFor(article.coverImage).url() : article.staticThumb;
+      return (
+        <a class="news-row" href={`/news#${article._id}`} data-thumb={thumbUrl}>
+          <span class="n-title" data-en={article.titleEn} data-de={article.titleDe}>{article.titleEn}</span>
+          <span class="n-date">{formatDate(article.date)}</span>
+          <span class="n-arrow"><span class="a-inner"><span>→</span><span>→</span></span></span>
+        </a>
+      );
+    })}
   </div>
 
   <!-- the floating preview that chases the cursor over news rows.
@@ -1014,138 +996,17 @@ svg.giant .giant-rainbow{
   <div class="hover-thumb" aria-hidden="true"><img src="" alt=""></div>
 
   <!-- will point to the full news overview page once it exists -->
-  <a class="btn-all" href="news.html" data-en="See all news" data-de="Alle News ansehen">See all news</a>
+  <a class="btn-all" href="/news" data-en="See all news" data-de="Alle News ansehen">See all news</a>
 </section>
 
 <!-- ===================== CONTACT / FOOTER ===================== -->
-<footer id="contact">
-  <div class="foot-grid">
-
-    <!-- city clocks — updated live by JavaScript, like the reference site -->
-    <div>
-      <span class="micro" data-en="On the road" data-de="Unterwegs">On the road</span>
-      <div class="clock-row"><span>Berlin</span>   <time id="clock-berlin">--:--</time></div>
-      <div class="clock-row"><span>London</span>   <time id="clock-london">--:--</time></div>
-      <div class="clock-row"><span>New York</span> <time id="clock-ny">--:--</time></div>
-    </div>
-
-    <div>
-      <span class="micro" data-en="Booking" data-de="Booking">Booking</span>
-      <a class="mail email-protect" data-user="booking" data-domain="skippingmondays.example">booking [at] skippingmondays.example</a>
-      <p style="margin-top:18px; font-size:13px; color:var(--gray);">
-        <span data-en="Management: Mel Okafor" data-de="Management: Mel Okafor">Management: Mel Okafor</span>
-      </p>
-    </div>
-
-    <div>
-      <span class="micro" data-en="Mailing list" data-de="Newsletter">Mailing list</span>
-      <!-- newsletter signup. TO CONNECT: create a second Formspree
-           form and replace YOUR_NEWSLETTER_ID (see skills.md).
-           Same honeypot trick as the contact form. -->
-      <form class="newsletter" action="https://formspree.io/f/YOUR_NEWSLETTER_ID" method="POST"
-            data-ok-en="You're in! No Monday emails, promise." data-ok-de="Du bist dabei! Keine Montags-Mails, versprochen."
-            data-err-en="That didn't work — try again?" data-err-de="Hat nicht geklappt — nochmal versuchen?"
-            data-off-en="Signup isn't connected yet." data-off-de="Anmeldung ist noch nicht verbunden.">
-        <div class="nl-row">
-          <input type="email" name="email" required placeholder="you@example.com" aria-label="Email address">
-          <button type="submit" aria-label="Subscribe">→</button>
-        </div>
-        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <p class="nl-note" data-en="Gig alerts &amp; new releases. Never on a Monday." data-de="Konzert-Alarm &amp; neue Releases. Nie montags.">Gig alerts &amp; new releases. Never on a Monday.</p>
-        <p class="form-status" role="status"></p>
-      </form>
-    </div>
-    <div>
-      <span class="micro" data-en="Follow" data-de="Folgen">Follow</span>
-      <ul>
-        <li><a href="#">Instagram</a></li>
-        <li><a href="#">TikTok</a></li>
-        <li><a href="#">Spotify</a></li>
-        <li><a href="#">YouTube</a></li>
-      </ul>
-    </div>
-
-  </div>
-
-  <!-- the huge wordmark, like an end credit -->
-  <!-- the giant end-credit wordmark:
-       viewBox = the drawing area (960 wide, 78 tall)
-       textLength="960" = stretch the text across the full 960
-       so the text always fills 100% of the width, on any screen -->
-  <div class="giant-wrap">
-    <svg class="giant" viewBox="0 0 960 78" aria-label="Skipping Mondays">
-      <defs>
-        <!-- EASTER EGG: a retro rainbow as CONCENTRIC RINGS.
-             The gradient's center sits BELOW the text, so the color
-             bands cross the letters as gentle arcs — like the corner
-             rainbow on a certain 2026 poster. Doubled stops = crisp
-             bands; spreadMethod="repeat" tiles the rings outward.
-             The two <animate> elements slowly swing the center and
-             breathe the radius, so the arcs drift organically. -->
-        <radialGradient id="rainbow" gradientUnits="userSpaceOnUse"
-                        cx="480" cy="220" r="260" spreadMethod="repeat">
-          <!-- SMOOTH BLEND version: one stop per color = soft gradient.
-               The first color repeats at the end so the rings tile
-               seamlessly. TO REVERT to crisp retro bands, replace
-               these stops with the doubled pairs below:
-               <stop offset="0.000" stop-color="#3D7BE8"/><stop offset="0.143" stop-color="#3D7BE8"/>
-               <stop offset="0.143" stop-color="#A78BE8"/><stop offset="0.286" stop-color="#A78BE8"/>
-               <stop offset="0.286" stop-color="#6B2C91"/><stop offset="0.429" stop-color="#6B2C91"/>
-               <stop offset="0.429" stop-color="#E63B2E"/><stop offset="0.571" stop-color="#E63B2E"/>
-               <stop offset="0.571" stop-color="#F58220"/><stop offset="0.714" stop-color="#F58220"/>
-               <stop offset="0.714" stop-color="#9FBF3B"/><stop offset="0.857" stop-color="#9FBF3B"/>
-               <stop offset="0.857" stop-color="#2E8C7A"/><stop offset="1.000" stop-color="#2E8C7A"/>
-          -->
-          <stop offset="0.000" stop-color="#3D7BE8"/>
-          <stop offset="0.143" stop-color="#A78BE8"/>
-          <stop offset="0.286" stop-color="#6B2C91"/>
-          <stop offset="0.429" stop-color="#E63B2E"/>
-          <stop offset="0.571" stop-color="#F58220"/>
-          <stop offset="0.714" stop-color="#9FBF3B"/>
-          <stop offset="0.857" stop-color="#2E8C7A"/>
-          <stop offset="1.000" stop-color="#3D7BE8"/>
-          <!-- the center (cx/cy) is driven by JavaScript — it lazily
-               chases the cursor. Only the radius still self-animates. -->
-          <animate id="rainbow-anim-r" attributeName="r"
-                   values="260;380;260" dur="8s" repeatCount="indefinite"/>
-        </radialGradient>
-      </defs>
-      <!-- layer 1: the normal wordmark -->
-      <text x="0" y="72" textLength="960" lengthAdjust="spacingAndGlyphs">SKIPPING MONDAYS</text>
-      <!-- layer 2: identical rainbow copy on top, invisible until
-           hover — fading ITS opacity is what makes the color melt
-           in and out (you can't crossfade a fill directly) -->
-      <text class="giant-rainbow" aria-hidden="true"
-            x="0" y="72" textLength="960" lengthAdjust="spacingAndGlyphs">SKIPPING MONDAYS</text>
-    </svg>
-  </div>
-
-  <div class="legal">
-    <span>© 2026 Skipping Mondays</span>
-    <span>
-      <a href="#" data-en="Privacy Policy" data-de="Datenschutz">Privacy Policy</a>
-      &nbsp;·&nbsp;
-      <a href="#" data-en="Imprint" data-de="Impressum">Imprint</a>
-    </span>
-  </div>
-</footer>
+<Footer id="contact" />
 
 </div><!-- /cover -->
 
 </div><!-- /page-content -->
 
-<!-- ===================== LIBRARIES =====================
-     three.js → the 3D dust
-     gsap + ScrollTrigger → animations tied to scrolling
-     lenis → buttery smooth scrolling (the "expensive site" feel) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<!-- CustomEase lets us define the guide's exact easing curve -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.14/lenis.min.js"></script>
-
-<script>
+<script is:inline define:vars={{ formattedSongs }}>
 /* ============================================================
    MOTION SYSTEM SETUP
    Values come from the Motion Stack Guide:
@@ -1339,18 +1200,8 @@ addEventListener('click', (e) => {
    Each item has a small label (the type) and a big title, and
    each carries BOTH languages so the DE/EN switcher always works.
    ============================================================ */
-const heroItems = [
-  { label: {en:'Upcoming gig',  de:'Nächstes Konzert'},
-    text:  {en:'Berlin — Lido · Sep 12',            de:'Berlin — Lido · 12. Sep'} },
-  { label: {en:'New release',   de:'Neue Single'},
-    text:  {en:'“Call In Sad” — out now',           de:'„Call In Sad“ — jetzt draußen'} },
-  { label: {en:'Announcement',  de:'Ankündigung'},
-    text:  {en:'The No-Alarm Tour — 5 cities',     de:'Die No-Alarm-Tour — 5 Städte'} },
-  { label: {en:'Upcoming gig',  de:'Nächstes Konzert'},
-    text:  {en:'Hamburg — Molotow · Sep 19',        de:'Hamburg — Molotow · 19. Sep'} },
-  { label: {en:'Announcement',  de:'Ankündigung'},
-    text:  {en:'Köln is sold out — danke!',         de:'Köln ist ausverkauft — danke!'} }
-];
+
+const heroItems = formattedSongs;
 let heroIndex = 0;
 const titleEl     = document.getElementById('cycle-title');
 const heroLabelEl = document.getElementById('cycle-label');

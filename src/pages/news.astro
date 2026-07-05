@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { sanityClient, urlFor, isSanityConfigured } from '../lib/sanity';
+
+// Check if Sanity is connected
+const hasSanity = isSanityConfigured;
+let newsArticles = [];
+
+if (hasSanity) {
+  try {
+    newsArticles = await sanityClient.fetch(`*[_type == "news"] | order(date desc)`);
+  } catch (err) {
+    console.error("Sanity fetch error for news:", err);
+  }
+}
+
+// Fallback to static articles if Sanity is not connected or returns empty
+if (!newsArticles || newsArticles.length === 0) {
+  newsArticles = [
+    {
+      _id: 'post-1',
+      date: '2026-06-28',
+      titleEn: '“Call In Sad” hits one million streams',
+      titleDe: '„Call In Sad“ knackt eine Million Streams',
+      bodyEn: 'One million of you pressed play on our saddest, sparkliest song. We wrote it on a Tuesday, recorded it in a kitchen in Neukölln, and never expected it to leave the building.\n\nThank you for every playlist add, every voice note, every questionable karaoke rendition. The next single is already whispering at us from the rehearsal room.',
+      bodyDe: 'Eine Million von euch hat Play gedrückt. Geschrieben an einem Dienstag, aufgenommen in einer Küche in Neukölln — wir hätten nie gedacht, dass der Song das Haus verlässt.\n\nDanke für jede Playlist, jede Sprachnachricht, jede fragwürdige Karaoke-Version. Die nächste Single flüstert uns schon aus dem Proberaum zu.',
+      staticImage: 'https://picsum.photos/seed/newsstreams/1600/1000'
+    },
+    {
+      _id: 'post-2',
+      date: '2026-06-15',
+      titleEn: 'Köln show sold out — second night under discussion',
+      titleDe: 'Köln ausverkauft — zweite Show in Planung',
+      bodyEn: 'Gebäude 9 is officially full. Köln, you did that in eleven days, which our booking agent says is “not normal” — we choose to take that as a compliment.\n\nWe\'re talking to the venue about a second night. If it happens, ticket alarm subscribers hear it first — no Monday announcements, obviously.',
+      bodyDe: 'Gebäude 9 ist offiziell voll. Köln, ihr habt das in elf Tagen geschafft — laut unserer Booking-Agentin „nicht normal“. Wir nehmen das als Kompliment.\n\nWir sprechen mit dem Club über einen zweiten Abend. Falls es klappt, erfahren es Ticket-Alarm-Abonnenten zuerst — natürlich nie montags.',
+      staticImage: 'https://picsum.photos/seed/newskoeln/1600/1000'
+    },
+    {
+      _id: 'post-3',
+      date: '2026-06-02',
+      titleEn: 'Studio diary: week one of album two',
+      titleDe: 'Studiotagebuch: Woche eins von Album zwei',
+      bodyEn: 'Day one: set up the synths. Day two: argued about a tambourine for five hours. Day three: the tambourine won. Album two is going to be honest, loud, and 4% percussion politics.\n\nProducer Mel Okafor has banned the word “vibe” from the control room. Progress has improved measurably since.',
+      bodyDe: 'Tag eins: Synths aufgebaut. Tag zwei: fünf Stunden über ein Tamburin gestritten. Tag drei: das Tamburin hat gewonnen. Album zwei wird ehrlich, laut und zu 4 % Percussion-Politik.\n\nProduzentin Mel Okafor hat das Wort „Vibe“ aus der Regie verbannt. Der Fortschritt hat sich seitdem messbar verbessert.',
+      staticImage: 'https://picsum.photos/seed/newsstudio/1600/1000'
+    },
+    {
+      _id: 'post-4',
+      date: '2026-05-21',
+      titleEn: 'The No-Alarm Tour announced — five cities',
+      titleDe: 'Die No-Alarm-Tour angekündigt — fünf Städte',
+      bodyEn: 'Berlin, Hamburg, Köln, München, Wien. Five rooms we love, zero early mornings, all shows starting fashionably late. Tickets are live now.\n\nSupport acts will be announced city by city. Bring earplugs and someone you like.',
+      bodyDe: 'Berlin, Hamburg, Köln, München, Wien. Fünf Räume, die wir lieben, null frühe Morgen, alle Shows beginnen elegant spät. Tickets sind ab sofort erhältlich.\n\nDie Support-Acts geben wir Stadt für Stadt bekannt. Bringt Ohrstöpsel mit und jemanden, den ihr mögt.',
+      staticImage: 'https://picsum.photos/seed/newstour/1600/1000'
+    },
+    {
+      _id: 'post-5',
+      date: '2026-05-09',
+      titleEn: 'New merch: the Snooze Button hoodie',
+      titleDe: 'Neuer Merch: der Snooze-Button-Hoodie',
+      bodyEn: 'It\'s soft. It\'s the color of 7:59 a.m. It has a giant snooze button on the sleeve that does nothing, which we find thematically consistent.\n\nAvailable at shows and in the web shop while supplies last. The web shop, unlike us, works Mondays.',
+      bodyDe: 'Er ist weich. Er hat die Farbe von 7:59 Uhr. Auf dem Ärmel sitzt ein riesiger Snooze-Knopf, der nichts tut — was wir thematisch konsequent finden.\n\nErhältlich bei Shows und im Webshop, solange der Vorrat reicht. Der Webshop arbeitet — anders als wir — auch montags.',
+      staticImage: 'https://picsum.photos/seed/newsmerch/1600/1000'
+    }
+  ];
+}
+
+// Helper to format date to DD.MM.YYYY
+function formatDate(dateStr: string) {
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  }
+  return dateStr;
+}
+---
+<BaseLayout title="News — Skipping Mondays">
+  <!-- ===================== PAGE HERO ===================== -->
+  <div class="page-hero">
+    <img src="https://picsum.photos/seed/newshero/1920/900" alt="Newspaper stack on an amp">
+    <h1 class="page-title" data-split data-en="News" data-de="Aktuelles">News</h1>
+  </div>
+
+  <main class="page-main">
+    <!-- QUICK FIND: this list builds ITSELF — site.js reads every
+         article below (date + title) and generates a jump link for
+         each. Add articles and the index updates automatically.
+         Typing in the field filters the list live. -->
+    <nav class="news-index" data-reveal aria-label="Article index">
+      <div class="micro" data-en="Quick find" data-de="Schnellsuche">Quick find</div>
+      <input class="index-filter" type="search" placeholder="Filter articles…">
+      <div class="idx-list"></div>
+    </nav>
+
+    {newsArticles.map((article) => {
+      const id = article._id;
+      const imageUrl = article.coverImage ? urlFor(article.coverImage).url() : article.staticImage;
+      const paragraphsEn = article.bodyEn.split('\n\n');
+      const paragraphsDe = article.bodyDe.split('\n\n');
+
+      return (
+        <article class="post" id={id}>
+          <div class="post-head">
+            <div class="post-date">{formatDate(article.date)}</div>
+            <h2 class="post-title" data-split data-en={article.titleEn} data-de={article.titleDe}>{article.titleEn}</h2>
+          </div>
+          <div class="post-body">
+            <figure class="post-hero reveal-img">
+              <img src={imageUrl} alt={article.titleEn} />
+            </figure>
+            
+            {paragraphsEn.map((p, idx) => (
+              <p 
+                data-en={p} 
+                data-de={paragraphsDe[idx] || p}
+              >
+                {p}
+              </p>
+            ))}
+          </div>
+        </article>
+      );
+    })}
+  </main>
+</BaseLayout>

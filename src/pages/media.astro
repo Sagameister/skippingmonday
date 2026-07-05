@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { sanityClient, urlFor, isSanityConfigured } from '../lib/sanity';
+
+// Check if Sanity is connected
+const hasSanity = isSanityConfigured;
+let videos = [];
+let photos = [];
+
+if (hasSanity) {
+  try {
+    videos = await sanityClient.fetch(`*[_type == "video"]`);
+    photos = await sanityClient.fetch(`*[_type == "photo"]`);
+  } catch (err) {
+    console.error("Sanity fetch error for media:", err);
+  }
+}
+
+// Fallback for videos if empty
+if (!videos || videos.length === 0) {
+  videos = [
+    { titleEn: '“Call In Sad” — Official Video', titleDe: '„Call In Sad“ — Offizielles Video', videoUrl: '#', staticImage: 'https://picsum.photos/seed/video5/1600/900' },
+    { titleEn: 'Tiny Kitchen Session', titleDe: 'Tiny Kitchen Session', videoUrl: '#', staticImage: 'https://picsum.photos/seed/kitchen/1600/900' },
+    { titleEn: 'Live at Molotow — Full Set', titleDe: 'Live im Molotow — Ganzes Set', videoUrl: '#', staticImage: 'https://picsum.photos/seed/livefull/1600/900' },
+    { titleEn: 'No-Alarm Tour — Documentary', titleDe: 'No-Alarm-Tour — Doku', videoUrl: '#', staticImage: 'https://picsum.photos/seed/tourdoc/1600/900' },
+    { titleEn: '“Tuesday Feels” — Lyric Video', titleDe: '„Tuesday Feels“ — Lyric-Video', videoUrl: '#', staticImage: 'https://picsum.photos/seed/lyricvid/1600/900' },
+    { titleEn: 'Acoustic at Dawn (One Take)', titleDe: 'Akustisch im Morgengrauen (One Take)', videoUrl: '#', staticImage: 'https://picsum.photos/seed/acoustic/1600/900' }
+  ];
+}
+
+// Fallback for photos if empty
+if (!photos || photos.length === 0) {
+  photos = [
+    { captionEn: 'Live at Molotow, Hamburg', captionDe: 'Live im Molotow, Hamburg', staticImage: 'https://picsum.photos/seed/concert1/900/1100' },
+    { captionEn: 'Studio session, Neukölln', captionDe: 'Studio-Session, Neukölln', staticImage: 'https://picsum.photos/seed/studio2/900/900' },
+    { captionEn: 'Band portrait, 2026', captionDe: 'Bandporträt, 2026', staticImage: 'https://picsum.photos/seed/portrait3/900/1200' },
+    { captionEn: 'The crowd, Gebäude 9', captionDe: 'Das Publikum, Gebäude 9', staticImage: 'https://picsum.photos/seed/crowd4/1200/900' },
+    { captionEn: 'Backstage, München', captionDe: 'Backstage, München', staticImage: 'https://picsum.photos/seed/backstage/1600/900' },
+    { captionEn: 'Soundcheck, Wien', captionDe: 'Soundcheck, Wien', staticImage: 'https://picsum.photos/seed/soundcheck/900/1000' },
+    { captionEn: 'Van life between cities', captionDe: 'Van-Leben zwischen Städten', staticImage: 'https://picsum.photos/seed/vanlife/1200/800' },
+    { captionEn: 'Confetti, last song', captionDe: 'Konfetti, letzter Song', staticImage: 'https://picsum.photos/seed/confetti/900/1300' }
+  ];
+}
+---
+<BaseLayout title="Media — Skipping Mondays">
+  <!-- ===================== PAGE HERO ===================== -->
+  <div class="page-hero">
+    <img src="https://picsum.photos/seed/mediahero/1920/900" alt="Camera at a live show">
+    <h1 class="page-title" data-split data-en="Media" data-de="Medien">Media</h1>
+  </div>
+
+  <main class="page-main">
+    <div class="sub-head first">
+      <h3 class="subtitle" data-split data-en="Video" data-de="Video">Video</h3>
+    </div>
+    <div class="video-grid">
+      {videos.map((vid) => {
+        const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : vid.staticImage;
+        return (
+          <figure class="vid reveal-img" data-reveal>
+            <a href={vid.videoUrl} aria-label={`Play: ${vid.titleEn}`}>
+              <span class="v-thumb">
+                <img src={thumbUrl} alt={vid.titleEn} />
+                <span class="play">▶</span>
+              </span>
+            </a>
+            <figcaption data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</figcaption>
+          </figure>
+        );
+      })}
+    </div>
+
+    <div class="sub-head">
+      <h3 class="subtitle" data-split data-en="Photos" data-de="Fotos">Photos</h3>
+    </div>
+    <div class="photo-wall">
+      {photos.map((ph) => {
+        const imgUrl = ph.image ? urlFor(ph.image).url() : ph.staticImage;
+        return (
+          <figure class="reveal-img">
+            <img src={imgUrl} alt={ph.captionEn} />
+            <figcaption data-en={ph.captionEn} data-de={ph.captionDe}>{ph.captionEn}</figcaption>
+          </figure>
+        );
+      })}
+    </div>
+  </main>
+</BaseLayout>

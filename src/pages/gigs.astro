@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { sanityClient, isSanityConfigured } from '../lib/sanity';
+
+// Check if Sanity is connected
+const hasSanity = isSanityConfigured;
+let gigs = [];
+
+if (hasSanity) {
+  try {
+    gigs = await sanityClient.fetch(`*[_type == "gig"] | order(date asc)`);
+  } catch (err) {
+    console.error("Sanity fetch error for gigs:", err);
+  }
+}
+
+// Fallback to static gigs if Sanity is not connected or returns empty
+if (!gigs || gigs.length === 0) {
+  gigs = [
+    { date: '2026-09-12', city: 'Berlin', venue: 'Lido, Kreuzberg', ticketUrl: '#', soldOut: false, isPast: false },
+    { date: '2026-09-19', city: 'Hamburg', venue: 'Molotow', ticketUrl: '#', soldOut: false, isPast: false },
+    { date: '2026-09-26', city: 'Köln', venue: 'Gebäude 9', ticketUrl: '#', soldOut: true, isPast: false },
+    { date: '2026-10-03', city: 'München', venue: 'Strom', ticketUrl: '#', soldOut: false, isPast: false },
+    { date: '2026-10-10', city: 'Wien', venue: 'Flex', ticketUrl: '#', soldOut: false, isPast: false },
+    // Past shows
+    { date: '2026-05-30', city: 'Leipzig', venue: 'UT Connewitz', ticketUrl: '#', soldOut: false, isPast: true },
+    { date: '2026-04-17', city: 'Berlin', venue: 'Badehaus', ticketUrl: '#', soldOut: false, isPast: true },
+    { date: '2026-03-21', city: 'Dresden', venue: 'Ostpol', ticketUrl: '#', soldOut: false, isPast: true },
+    { date: '2026-02-14', city: 'Berlin', venue: 'Schokoladen', ticketUrl: '#', soldOut: false, isPast: true }
+  ];
+}
+
+// Helper to format date to DD.MM.YYYY
+function formatDate(dateStr: string) {
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  }
+  return dateStr;
+}
+
+const upcomingGigs = gigs.filter(g => !g.isPast);
+const pastGigs = gigs.filter(g => g.isPast);
+---
+<BaseLayout title="Gigs — Skipping Mondays">
+  <!-- ===================== PAGE HERO ===================== -->
+  <div class="page-hero">
+    <img src="https://picsum.photos/seed/gigshero/1920/900" alt="Stage lights before the show">
+    <h1 class="page-title" data-split data-en="Gigs" data-de="Konzerte">Gigs</h1>
+  </div>
+
+  <main class="page-main">
+    <div class="sub-head first">
+      <h3 class="subtitle" data-split data-en="Upcoming" data-de="Demnächst">Upcoming</h3>
+    </div>
+    <div class="gigs-list">
+      {upcomingGigs.map((gig) => (
+        <div class="gig" data-reveal>
+          <span class="g-date">{formatDate(gig.date)}</span>
+          <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
+          {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
+        </div>
+      ))}
+    </div>
+
+    <div class="sub-head">
+      <h3 class="subtitle" data-split data-en="Past shows" data-de="Vergangene Shows">Past shows</h3>
+    </div>
+    <div class="gigs-list">
+      {pastGigs.map((gig) => (
+        <div class="gig past" data-reveal>
+          <span class="g-date">{formatDate(gig.date)}</span>
+          <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
+          {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
+        </div>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

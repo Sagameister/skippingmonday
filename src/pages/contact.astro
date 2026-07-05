@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Contact — Skipping Mondays">
+  <!-- ===================== PAGE HERO ===================== -->
+  <div class="page-hero">
+    <img src="https://picsum.photos/seed/contacthero/1920/900" alt="Backstage telephone">
+    <h1 class="page-title" data-split data-en="Contact" data-de="Kontakt">Contact</h1>
+  </div>
+
+  <main class="page-main">
+    <!-- ===================== CONTACT FORM =====================
+         The form posts to Formspree (a free form-to-email service).
+         TO CONNECT IT: create a form at https://formspree.io, then
+         replace YOUR_FORM_ID in the action below with your real ID.
+         Until then, submissions show a friendly "not connected" note.
+         Spam defenses: the _gotcha honeypot field below is invisible
+         to humans — bots that fill it are silently ignored, both here
+         and by Formspree's own filters. -->
+    <div class="sub-head first">
+      <h3 class="subtitle" data-split data-en="Write to us" data-de="Schreib uns">Write to us</h3>
+    </div>
+    <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST"
+          data-sending-en="Sending…" data-sending-de="Wird gesendet…"
+          data-ok-en="Thanks! We'll reply — any day but Monday." data-ok-de="Danke! Wir antworten — an jedem Tag außer Montag."
+          data-err-en="Something went wrong. Please try again or email us directly below." data-err-de="Etwas ist schiefgelaufen. Bitte erneut versuchen oder direkt per E-Mail schreiben."
+          data-off-en="The form isn't connected yet — please use the direct emails below." data-off-de="Das Formular ist noch nicht verbunden — bitte die direkten E-Mails unten nutzen.">
+      <div class="form-row">
+        <label>
+          <span class="micro" data-en="Your name" data-de="Dein Name">Your name</span>
+          <input type="text" name="name" required autocomplete="name">
+        </label>
+        <label>
+          <span class="micro" data-en="Your email" data-de="Deine E-Mail">Your email</span>
+          <input type="email" name="_replyto" required autocomplete="email">
+        </label>
+      </div>
+      <label>
+        <span class="micro" data-en="Topic" data-de="Thema">Topic</span>
+        <select name="topic">
+          <option data-en="Booking" data-de="Booking">Booking</option>
+          <option data-en="Press" data-de="Presse">Press</option>
+          <option data-en="Management" data-de="Management">Management</option>
+          <option data-en="Just saying hi" data-de="Nur hallo sagen">Just saying hi</option>
+        </select>
+      </label>
+      <label>
+        <span class="micro" data-en="Message" data-de="Nachricht">Message</span>
+        <textarea name="message" rows="6" required></textarea>
+      </label>
+      <!-- HONEYPOT: humans never see this field; bots fill everything.
+           A filled honeypot = spam, silently dropped. -->
+      <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn-all" type="submit" data-en="Send message" data-de="Nachricht senden">Send message</button>
+      <p class="form-status" role="status"></p>
+    </form>
+
+    <!-- direct emails, assembled by JavaScript so harvesters scanning
+         the HTML source never see a complete address -->
+    <div class="sub-head">
+      <h3 class="subtitle" data-split data-en="Direct lines" data-de="Direkte Drähte">Direct lines</h3>
+    </div>
+    <div class="contact-grid">
+      <div data-reveal>
+        <span class="micro" data-en="Booking" data-de="Booking">Booking</span>
+        <a class="mail-big email-protect" data-user="booking" data-domain="skippingmondays.example">booking [at] skippingmondays.example</a>
+        <p class="contact-note" data-en="For shows, festivals and private hauntings." data-de="Für Shows, Festivals und private Heimsuchungen.">For shows, festivals and private hauntings.</p>
+      </div>
+      <div data-reveal>
+        <span class="micro" data-en="Management" data-de="Management">Management</span>
+        <a class="mail-big email-protect" data-user="mel" data-domain="skippingmondays.example">mel [at] skippingmondays.example</a>
+        <p class="contact-note" data-en="Mel Okafor — everything else." data-de="Mel Okafor — alles andere.">Mel Okafor — everything else.</p>
+      </div>
+      <div data-reveal>
+        <span class="micro" data-en="Press" data-de="Presse">Press</span>
+        <a class="mail-big email-protect" data-user="press" data-domain="skippingmondays.example">press [at] skippingmondays.example</a>
+        <p class="contact-note" data-en="Photos and press kit on request — or grab them from the Media page." data-de="Fotos und Pressekit auf Anfrage — oder direkt von der Medien-Seite.">Photos and press kit on request — or grab them from the Media page.</p>
+      </div>
+    </div>
+
+    <div class="sub-head">
+      <h3 class="subtitle" data-split data-en="One inbox rule" data-de="Eine Postfach-Regel">One inbox rule</h3>
+    </div>
+    <p style="max-width:640px; font-size:16px; line-height:1.75; color:rgba(255,248,240,.85);"
+       data-en="We answer every email — Tuesday through Sunday. Mail sent on a Monday is lovingly ignored until it isn't Monday anymore."
+       data-de="Wir beantworten jede E-Mail — dienstags bis sonntags. Montags gesendete Mails werden liebevoll ignoriert, bis nicht mehr Montag ist.">
+       We answer every email — Tuesday through Sunday. Mail sent on a Monday is lovingly ignored until it isn't Monday anymore.</p>
+  </main>
+</BaseLayout>

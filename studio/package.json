@@ -1,0 +1,20 @@
+{
+  "name": "skipping-mondays-studio",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "devDependencies": {},
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sanity": "^3.30.0",
+    "styled-components": "^6.1.8"
+  },
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "start": "sanity start",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  }
+}

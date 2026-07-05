@@ -1,0 +1,22 @@
+---
+import Head from '../components/Head.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/styles.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <Head title={title} />
+  <body>
+    <Header />
+    <slot />
+    <Footer />
+    <script is:inline src="/site.js"></script>
+  </body>
+</html>
