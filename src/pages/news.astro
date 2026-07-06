@@ -8,7 +8,7 @@ let newsArticles = [];
 
 if (hasSanity) {
   try {
-    newsArticles = await sanityClient.fetch(`*[_type == "news"] | order(date desc)`);
+    newsArticles = await sanityClient.fetch(`*[_type == "post" && postType == "news"] | order(date desc)`);
   } catch (err) {
     console.error("Sanity fetch error for news:", err);
   }

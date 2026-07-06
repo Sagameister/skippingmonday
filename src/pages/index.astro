@@ -14,8 +14,8 @@ let photos = [];
 if (hasSanity) {
   try {
     heroSongs = await sanityClient.fetch(`*[_type == "song"]`);
-    gigs = await sanityClient.fetch(`*[_type == "gig" && !isPast] | order(date asc)[0..4]`);
-    newsArticles = await sanityClient.fetch(`*[_type == "news"] | order(date desc)[0..4]`);
+    gigs = await sanityClient.fetch(`*[_type == "post" && postType == "gig" && !isPast] | order(date asc)[0..4]`);
+    newsArticles = await sanityClient.fetch(`*[_type == "post" && postType == "news"] | order(date desc)[0..4]`);
     photos = await sanityClient.fetch(`*[_type == "photo" && isFeatured == true]`);
   } catch (err) {
     console.error("Sanity fetch homepage data error:", err);
