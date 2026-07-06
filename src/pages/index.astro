@@ -1317,41 +1317,149 @@ function sizeDust(){
 sizeDust();
 addEventListener('resize', sizeDust);
 
-// build ONE cloud of points — much cheaper than many meshes
-const COUNT = 120;
-const positions = new Float32Array(COUNT * 3);           // x,y,z for every speck
-for (let i = 0; i < COUNT; i++){
-  positions[i*3    ] = (Math.random() - 0.5) * 24;       // x
-  positions[i*3 + 1] = (Math.random() - 0.5) * 12;       // y
-  positions[i*3 + 2] = (Math.random() - 0.5) * 6;        // z
-}
-const dustGeo = new THREE.BufferGeometry();
-dustGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-const dustMat = new THREE.PointsMaterial({
-  color: 0x999999,        // light gray
-  size: 0.06,
-  transparent: true,
-  opacity: 0.7
-});
-const dust = new THREE.Points(dustGeo, dustMat);
-scene.add(dust);
+// Helper to create a texture of a musical note symbol drawn on a canvas
+function createNoteTexture(char, blur) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
 
-// gentle drift + a slow lean toward the mouse
+  // Draw note in the center
+  ctx.font = '64px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#999999';
+
+  // Apply shadow blur to simulate depth of field (blurry far away, sharp up close)
+  if (blur > 0) {
+    ctx.shadowColor = 'rgba(153, 153, 153, 0.7)';
+    ctx.shadowBlur = blur;
+  }
+
+  ctx.fillText(char, 64, 64);
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Generate textures for different depths (blurry, medium, crisp)
+const noteChars = ['♩', '♪', '♫', '♬'];
+const textures = {
+  crisp: noteChars.map(char => createNoteTexture(char, 0)),
+  medium: noteChars.map(char => createNoteTexture(char, 4)),
+  blurry: noteChars.map(char => createNoteTexture(char, 12))
+};
+
+// Create a group of sprites
+const sprites = [];
+const COUNT = 120;
+
+for (let i = 0; i < COUNT; i++) {
+  // Set random position in a 3D bounding area
+  const x = (Math.random() - 0.5) * 24;
+  const y = (Math.random() - 0.5) * 12;
+  const z = (Math.random() - 0.5) * 8; // z depth field
+
+  let textureList;
+  let opacity;
+  let scale;
+
+  // Distribute textures, opacities, and sizes based on Z-depth
+  if (z < -1.5) {
+    textureList = textures.blurry;
+    opacity = 0.25 + (Math.random() * 0.15); // far back: blurry, dim
+    scale = 0.9 + (Math.random() * 0.4);     // blur makes them look larger
+  } else if (z > 1.5) {
+    textureList = textures.crisp;
+    opacity = 0.65 + (Math.random() * 0.2);  // up close: sharp, bright
+    scale = 0.4 + (Math.random() * 0.2);     // sharp is smaller/tighter
+  } else {
+    textureList = textures.medium;
+    opacity = 0.45 + (Math.random() * 0.2);  // midground: medium blur
+    scale = 0.6 + (Math.random() * 0.3);
+  }
+
+  // Pick a random musical note character
+  const randomTexture = textureList[Math.floor(Math.random() * textureList.length)];
+
+  const material = new THREE.SpriteMaterial({
+    map: randomTexture,
+    transparent: true,
+    opacity: opacity,
+    color: 0x8a8a8a
+  });
+
+  const sprite = new THREE.Sprite(material);
+  sprite.position.set(x, y, z);
+  sprite.scale.set(scale, scale, 1);
+
+  // Store original positions and random drift multipliers
+  sprite.userData = {
+    homeX: x,
+    homeY: y,
+    homeZ: z,
+    angle: Math.random() * Math.PI * 2,
+    speed: 0.1 + Math.random() * 0.3,
+    orbitRadius: 0.2 + Math.random() * 0.4
+  };
+
+  scene.add(sprite);
+  sprites.push(sprite);
+}
+
+// Gentle drift + interactive cursor push-away physics
 let mx = 0, my = 0;
 addEventListener('mousemove', (e) => {
   mx = e.clientX / innerWidth  - 0.5;
   my = e.clientY / innerHeight - 0.5;
 });
+
 const clock = new THREE.Clock();
 if (prefersReduced) {
-  renderer.render(scene, camera);   // draw the dust once, but don't move it
+  renderer.render(scene, camera); // render static layout once if motion is disabled
 } else {
   (function animate(){
     requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
-    dust.rotation.y = t * 0.02 + mx * 0.15;   // very slow spin
-    dust.rotation.x = my * 0.1;
-    dust.position.y = Math.sin(t * 0.3) * 0.3; // soft up-down breathing
+
+    // Map 2D mouse coordinates (-0.5 to 0.5) to approximate 3D world coordinates
+    const mouse3D = {
+      x: mx * 20,
+      y: -my * 10
+    };
+
+    sprites.forEach((sprite) => {
+      const data = sprite.userData;
+
+      // Orbiting drift (gentle floating motion)
+      const driftX = Math.sin(t * 0.5 * data.speed + data.angle) * data.orbitRadius;
+      const driftY = Math.cos(t * 0.4 * data.speed + data.angle) * data.orbitRadius;
+      const targetX = data.homeX + driftX;
+      const targetY = data.homeY + driftY;
+
+      // Cursor magnetic push physics (nodes drift away if mouse gets close)
+      const dx = sprite.position.x - mouse3D.x;
+      const dy = sprite.position.y - mouse3D.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      let pushX = 0;
+      let pushY = 0;
+      const radius = 3.5; // push radius
+
+      if (dist < radius) {
+        // Push force increases as cursor gets closer, up to a limit
+        const force = (radius - dist) / radius * 0.8;
+        pushX = (dx / (dist || 0.001)) * force;
+        pushY = (dy / (dist || 0.001)) * force;
+      }
+
+      // Smoothly ease position toward target + push force
+      sprite.position.x += (targetX + pushX - sprite.position.x) * 0.08;
+      sprite.position.y += (targetY + pushY - sprite.position.y) * 0.08;
+    });
+
+    // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
+    scene.rotation.y = mx * 0.15;
+    scene.rotation.x = my * 0.1;
+
     renderer.render(scene, camera);
   })();
 }

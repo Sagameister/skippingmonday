@@ -66,6 +66,8 @@ The site is fully responsive, bilingual, and cross-linked:
 5. **Cursor-lag physics** — News and Gigs list rows both use the cursor-chasing image preview drawer.
 6. **Footer wordmark** — SVG path drawing of the vector wordmark (replaces plain text). Fades in the rainbow copy (radial gradient with animation) on hover.
 7. **Bespoke Page Transitions:** Standard SPA router transitions (like Astro ViewTransitions) often conflict with persistent Three.js contexts, WebGL loops, and global GSAP tickers, causing memory leaks and double-binding glitches. Instead, the site uses a custom page-fade implementation: body opacity is set to `0` by default; JS transitions to `page-ready` (opacity 1) on load, intercepts internal link clicks to fade the page out, and navigates after 350ms. Restores opacity on browser back buttons using the `pageshow` (BFcache) listener.
+8. **Interactive 3D Music Particles (Depth of Field):** The "Never on a Monday" statement sheet backdrop runs a custom Three.js WebGL rendering of floating musical notes (♩, ♪, ♫, ♬) drawn onto canvas sprites. It simulates depth of field by distributing blurred/medium/crisp canvas textures, varying sizes, and dimming opacities based on the randomly generated Z-depth. Interacts responsively by calculating 3D mouse vector distances and pushing nodes smoothly away from the cursor, easing them back to their home orbit path as the mouse leaves.
+
 
 ## Hard-Won Lessons (do not re-learn these the painful way)
 
