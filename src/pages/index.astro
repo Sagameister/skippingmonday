@@ -666,9 +666,14 @@ section{ padding: 14vh 3vw; }
   align-items: center;      /* date, venue and note all sit mid-row */
   padding: 26px 0;
   border-top: 1px solid var(--line);
-  /* announcements, not links: no hover states, no cursor tricks */
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity .25s;
 }
 .gig:last-of-type{ border-bottom:1px solid var(--line); }
+.gigs-list:hover .gig{ opacity:.35; }
+.gigs-list:hover .gig:hover{ opacity:1; }
 .g-date{
   font-size:13px;
   color:var(--gray);
@@ -899,13 +904,16 @@ svg.giant .giant-rainbow{
   </div>
 
   <div class="gigs-list">
-    {gigs.map((gig) => (
-      <div class="gig">
-        <span class="g-date">{formatDate(gig.date)}</span>
-        <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
-        {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
-      </div>
-    ))}
+    {gigs.map((gig) => {
+      const thumbUrl = gig.coverImage ? urlFor(gig.coverImage).url() : 'https://picsum.photos/seed/gighover/480/360';
+      return (
+        <a class="gig" href={`/gigs#${gig._id}`} data-thumb={thumbUrl}>
+          <span class="g-date">{formatDate(gig.date)}</span>
+          <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
+          {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
+        </a>
+      );
+    })}
   </div>
 </section>
 
@@ -1569,7 +1577,7 @@ if (!prefersReduced && window.matchMedia('(hover: hover)').matches){
     gsap.set(hoverThumb, { x: thumbPos.x, y: thumbPos.y });
   });
 
-  document.querySelectorAll('.news-row').forEach((row) => {
+  document.querySelectorAll('.news-row, #gigs .gig').forEach((row) => {
     row.addEventListener('mouseenter', (e) => {
       hoverThumbImg.src = row.dataset.thumb;      // this row's picture
       // start AT the cursor so it doesn't fly in from across the page

@@ -637,3 +637,59 @@ svg.giant .giant-rainbow{
   .members{ grid-template-columns: 1fr; }
   .page-hero{ height: 52vh; min-height: 340px; }
 }
+
+/* ============================================================
+   GIG DETAIL METADATA & TICKETING (Gigs Page Blog Style)
+   ============================================================ */
+.gig-details-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin: 24px 0 32px 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.meta-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gray);
+}
+.meta-value {
+  font-size: 15px;
+  font-weight: 500;
+}
+.ticket-btn {
+  display: inline-block;
+  padding: 6px 16px;
+  border: 1px solid var(--black);
+  color: var(--black);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.ticket-btn:hover {
+  background-color: var(--black);
+  color: var(--white);
+}
+.sold-out-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background-color: #f1f1f1;
+  color: #888;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: not-allowed;
+}

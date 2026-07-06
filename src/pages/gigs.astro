@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { sanityClient, isSanityConfigured } from '../lib/sanity';
+import { sanityClient, urlFor, isSanityConfigured } from '../lib/sanity';
 
 // Check if Sanity is connected
 const hasSanity = isSanityConfigured;
@@ -17,16 +17,119 @@ if (hasSanity) {
 // Fallback to static gigs if Sanity is not connected or returns empty
 if (!gigs || gigs.length === 0) {
   gigs = [
-    { date: '2026-09-12', city: 'Berlin', venue: 'Lido, Kreuzberg', ticketUrl: '#', soldOut: false, isPast: false },
-    { date: '2026-09-19', city: 'Hamburg', venue: 'Molotow', ticketUrl: '#', soldOut: false, isPast: false },
-    { date: '2026-09-26', city: 'Köln', venue: 'Gebäude 9', ticketUrl: '#', soldOut: true, isPast: false },
-    { date: '2026-10-03', city: 'München', venue: 'Strom', ticketUrl: '#', soldOut: false, isPast: false },
-    { date: '2026-10-10', city: 'Wien', venue: 'Flex', ticketUrl: '#', soldOut: false, isPast: false },
+    {
+      _id: 'gig-1',
+      date: '2026-09-12',
+      city: 'Berlin',
+      venue: 'Lido, Kreuzberg',
+      time: '20:00',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: false,
+      isPast: false,
+      titleEn: 'Berlin — Lido, Kreuzberg',
+      titleDe: 'Berlin — Lido, Kreuzberg',
+      bodyEn: 'Back in Kreuzberg! Lido is one of our absolute favorite rooms in the city—sweaty walls, perfect sound, and a crowd that never stays still. We are bringing some brand new, unreleased material from the upcoming second album to test out on you.\n\nDoors open at 19:30, support act Mel Okafor goes on at 20:00. This show is likely to sell out, so grab your tickets early!',
+      bodyDe: 'Zurück in Kreuzberg! Das Lido ist einer unserer absoluten Lieblingsclubs in der Stadt—schwitzige Wände, perfekter Sound und ein Publikum, das niemals stillsteht. Wir bringen brandneues, unveröffentlichtes Material vom kommenden zweiten Album mit, um es an euch zu testen.\n\nEinlass ist um 19:30 Uhr, Support Mel Okafor startet um 20:00 Uhr. Die Show wird wahrscheinlich ausverkauft sein, holt euch also frühzeitig Tickets!',
+      staticImage: 'https://picsum.photos/seed/gig1/1600/1000'
+    },
+    {
+      _id: 'gig-2',
+      date: '2026-09-19',
+      city: 'Hamburg',
+      venue: 'Molotow',
+      time: '21:00',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: false,
+      isPast: false,
+      titleEn: 'Hamburg — Molotow',
+      titleDe: 'Hamburg — Molotow',
+      bodyEn: 'Hamburg is our second home. Returning to the legendary Molotow stage is always a highlight of any tour. This is going to be loud, fast, and we are planning to play until they throw us out.\n\nSupport is local Hamburg outfit Tuesday Feels. See you down front!',
+      bodyDe: 'Hamburg ist unsere zweite Heimat. Die Rückkehr auf die legendäre Molotow-Bühne ist immer ein Highlight jeder Tour. Das wird laut, schnell, und wir planen zu spielen, bis sie uns rausschmeißen.\n\nSupport ist die Hamburger Band Tuesday Feels. Wir sehen uns ganz vorne!',
+      staticImage: 'https://picsum.photos/seed/gig2/1600/1000'
+    },
+    {
+      _id: 'gig-3',
+      date: '2026-09-26',
+      city: 'Köln',
+      venue: 'Gebäude 9',
+      time: '20:30',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: true,
+      isPast: false,
+      titleEn: 'Köln — Gebäude 9',
+      titleDe: 'Köln — Gebäude 9',
+      bodyEn: 'Gebäude 9 is officially sold out! Thank you, Köln, you did that in just eleven days! We are working on a potential second night, but for those who got tickets—prepare yourselves for a special show.\n\nDoors at 19:30, show starts at 20:30. No early mornings after this one.',
+      bodyDe: 'Das Gebäude 9 ist offiziell ausverkauft! Danke, Köln, ihr habt das in nur elf Tagen geschafft! Wir arbeiten an einem möglichen zweiten Abend, aber für diejenigen, die Tickets haben—macht euch auf eine ganz besondere Show gefasst.\n\nEinlass um 19:30, Beginn um 20:30. Danach gibt es kein frühes Aufstehen.',
+      staticImage: 'https://picsum.photos/seed/gig3/1600/1000'
+    },
+    {
+      _id: 'gig-4',
+      date: '2026-10-03',
+      city: 'München',
+      venue: 'Strom',
+      time: '20:00',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: false,
+      isPast: false,
+      titleEn: 'München — Strom',
+      titleDe: 'München — Strom',
+      bodyEn: 'Bringing the Snooze Button energy to München! We will be playing at Strom, setting up the synths and the guitars for a long night of music.\n\nTickets are selling fast. Support to be announced next week.',
+      bodyDe: 'Wir bringen die Snooze-Button-Energie nach München! Wir spielen im Strom, bauen die Synths und Gitarren für eine lange Nacht voller Musik auf.\n\nTickets verkaufen sich schnell. Support wird nächste Woche bekannt gegeben.',
+      staticImage: 'https://picsum.photos/seed/gig4/1600/1000'
+    },
+    {
+      _id: 'gig-5',
+      date: '2026-10-10',
+      city: 'Wien',
+      venue: 'Flex',
+      time: '21:30',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: false,
+      isPast: false,
+      titleEn: 'Wien — Flex',
+      titleDe: 'Wien — Flex',
+      bodyEn: 'Last stop of the autumn run is the canal side in Wien. We are closing out this block of shows at Flex. We expect confetti, sweat, and maybe a little bit of emotional fatigue.\n\nDoors open late at 20:30, support at 21:00, show at 21:30. Let\'s make this one count.',
+      bodyDe: 'Die letzte Station der Herbst-Tour ist der Donaukanal in Wien. Wir schließen diesen Konzertblock im Flex ab. Wir erwarten Konfetti, Schweiß und vielleicht ein bisschen emotionale Erschöpfung.\n\nEinlass erst um 20:30, Support um 21:00, Show um 21:30. Lasst uns diesen Abend unvergesslich machen.',
+      staticImage: 'https://picsum.photos/seed/gig5/1600/1000'
+    },
     // Past shows
-    { date: '2026-05-30', city: 'Leipzig', venue: 'UT Connewitz', ticketUrl: '#', soldOut: false, isPast: true },
-    { date: '2026-04-17', city: 'Berlin', venue: 'Badehaus', ticketUrl: '#', soldOut: false, isPast: true },
-    { date: '2026-03-21', city: 'Dresden', venue: 'Ostpol', ticketUrl: '#', soldOut: false, isPast: true },
-    { date: '2026-02-14', city: 'Berlin', venue: 'Schokoladen', ticketUrl: '#', soldOut: false, isPast: true }
+    {
+      _id: 'gig-past-1',
+      date: '2026-05-30',
+      city: 'Leipzig',
+      venue: 'UT Connewitz',
+      time: '20:00',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: false,
+      isPast: true,
+      titleEn: 'Leipzig — UT Connewitz',
+      titleDe: 'Leipzig — UT Connewitz',
+      bodyEn: 'An incredible night in the historical UT Connewitz theatre. The room felt magical and the acoustics were absolute perfection. Thank you to everyone who shared this warm spring evening with us.',
+      bodyDe: 'Ein unglaublicher Abend im historischen UT Connewitz. Der Raum wirkte magisch und die Akustik war absolut perfekt. Vielen Dank an alle, die diesen warmen Frühlingsabend mit uns geteilt haben.',
+      staticImage: 'https://picsum.photos/seed/gigpast1/1600/1000'
+    },
+    {
+      _id: 'gig-past-2',
+      date: '2026-04-17',
+      city: 'Berlin',
+      venue: 'Badehaus',
+      time: '20:00',
+      locationType: 'indoors',
+      ticketUrl: '#',
+      soldOut: false,
+      isPast: true,
+      titleEn: 'Berlin — Badehaus',
+      titleDe: 'Berlin — Badehaus',
+      bodyEn: 'A sweaty, packed, intimate night at Badehaus in RAW. Playing so close to the crowd was a reminder of why we do this. Special thanks to Tuesday Feels for joining us.',
+      bodyDe: 'Eine schweißtreibende, volle, intime Nacht im Badehaus auf dem RAW-Gelände. So nah am Publikum zu spielen, hat uns wieder gezeigt, warum wir das tun. Besonderen Dank an Tuesday Feels, die dabei waren.',
+      staticImage: 'https://picsum.photos/seed/gigpast2/1600/1000'
+    }
   ];
 }
 
@@ -50,30 +153,132 @@ const pastGigs = gigs.filter(g => g.isPast);
   </div>
 
   <main class="page-main">
-    <div class="sub-head first">
-      <h3 class="subtitle" data-split data-en="Upcoming" data-de="Demnächst">Upcoming</h3>
-    </div>
-    <div class="gigs-list">
-      {upcomingGigs.map((gig) => (
-        <div class="gig" data-reveal>
-          <span class="g-date">{formatDate(gig.date)}</span>
-          <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
-          {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
-        </div>
-      ))}
-    </div>
+    <!-- QUICK FIND: this list builds ITSELF — site.js reads every
+         article below (date + title) and generates a jump link for
+         each. Add articles and the index updates automatically.
+         Typing in the field filters the list live. -->
+    <nav class="news-index" data-reveal aria-label="Gigs index">
+      <div class="micro" data-en="Quick find" data-de="Schnellsuche">Quick find</div>
+      <input class="index-filter" type="search" placeholder="Filter gigs…">
+      <div class="idx-list"></div>
+    </nav>
 
-    <div class="sub-head">
-      <h3 class="subtitle" data-split data-en="Past shows" data-de="Vergangene Shows">Past shows</h3>
+    <div class="sub-head first">
+      <h3 class="subtitle" data-split data-en="Upcoming Shows" data-de="Kommende Shows">Upcoming Shows</h3>
     </div>
-    <div class="gigs-list">
-      {pastGigs.map((gig) => (
-        <div class="gig past" data-reveal>
-          <span class="g-date">{formatDate(gig.date)}</span>
-          <div class="g-title" data-split>{gig.city} — {gig.venue}</div>
-          {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
+    
+    {upcomingGigs.map((gig) => {
+      const id = gig._id;
+      const imageUrl = gig.coverImage ? urlFor(gig.coverImage).url() : gig.staticImage;
+      const paragraphsEn = gig.bodyEn ? gig.bodyEn.split('\n\n') : ['No details available yet.'];
+      const paragraphsDe = gig.bodyDe ? gig.bodyDe.split('\n\n') : [paragraphsEn[0]];
+
+      return (
+        <article class="post" id={id}>
+          <div class="post-head">
+            <div class="post-date">{formatDate(gig.date)}</div>
+            <h2 class="post-title" data-split data-en={`${gig.city} — ${gig.venue}`} data-de={`${gig.city} — ${gig.venue}`}>
+              {gig.city} — {gig.venue}
+            </h2>
+          </div>
+          <div class="post-body">
+            <figure class="post-hero reveal-img">
+              <img src={imageUrl} alt={`${gig.city} — ${gig.venue}`} />
+            </figure>
+            
+            <div class="gig-details-meta">
+              <div class="meta-item">
+                <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
+                <span class="meta-value">{gig.time || '20:00'}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label" data-en="Setting" data-de="Location">Setting</span>
+                <span class="meta-value" data-en={gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'} data-de={gig.locationType === 'outdoors' ? 'Open Air' : 'Indoor'}>
+                  {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label" data-en="Tickets" data-de="Tickets">Tickets</span>
+                <span class="meta-value">
+                  {gig.soldOut ? (
+                    <span class="sold-out-badge" data-en="Sold Out" data-de="Ausverkauft">Sold Out</span>
+                  ) : (
+                    <a href={gig.ticketUrl || '#'} class="ticket-btn" target="_blank" rel="noopener noreferrer" data-en="Get Tickets" data-de="Tickets kaufen">Get Tickets</a>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {paragraphsEn.map((p, idx) => (
+              <p 
+                data-en={p} 
+                data-de={paragraphsDe[idx] || p}
+              >
+                {p}
+              </p>
+            ))}
+          </div>
+        </article>
+      );
+    })}
+
+    {pastGigs.length > 0 && (
+      <>
+        <div class="sub-head">
+          <h3 class="subtitle" data-split data-en="Past shows" data-de="Vergangene Shows">Past shows</h3>
         </div>
-      ))}
-    </div>
+        
+        {pastGigs.map((gig) => {
+          const id = gig._id;
+          const imageUrl = gig.coverImage ? urlFor(gig.coverImage).url() : gig.staticImage;
+          const paragraphsEn = gig.bodyEn ? gig.bodyEn.split('\n\n') : ['Show completed.'];
+          const paragraphsDe = gig.bodyDe ? gig.bodyDe.split('\n\n') : [paragraphsEn[0]];
+
+          return (
+            <article class="post past" id={id}>
+              <div class="post-head">
+                <div class="post-date">{formatDate(gig.date)}</div>
+                <h2 class="post-title" data-split data-en={`${gig.city} — ${gig.venue}`} data-de={`${gig.city} — ${gig.venue}`}>
+                  {gig.city} — {gig.venue}
+                </h2>
+              </div>
+              <div class="post-body">
+                <figure class="post-hero reveal-img">
+                  <img src={imageUrl} alt={`${gig.city} — ${gig.venue}`} />
+                </figure>
+                
+                <div class="gig-details-meta">
+                  <div class="meta-item">
+                    <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
+                    <span class="meta-value">{gig.time || '20:00'}</span>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label" data-en="Setting" data-de="Location">Setting</span>
+                    <span class="meta-value" data-en={gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'} data-de={gig.locationType === 'outdoors' ? 'Open Air' : 'Indoor'}>
+                      {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
+                    </span>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label" data-en="Status" data-de="Status">Status</span>
+                    <span class="meta-value">
+                      <span class="sold-out-badge" data-en="Completed" data-de="Beendet">Completed</span>
+                    </span>
+                  </div>
+                </div>
+
+                {paragraphsEn.map((p, idx) => (
+                  <p 
+                    data-en={p} 
+                    data-de={paragraphsDe[idx] || p}
+                  >
+                    {p}
+                  </p>
+                ))}
+              </div>
+            </article>
+          );
+        })}
+      </>
+    )}
   </main>
 </BaseLayout>
