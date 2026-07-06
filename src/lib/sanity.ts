@@ -10,7 +10,7 @@ const projectId = isValidFormat ? rawProjectId : 'dummyid12';
 export const sanityClient = createClient({
   projectId: projectId,
   dataset: import.meta.env.PUBLIC_SANITY_DATASET || 'production',
-  useCdn: true, // true for fast response, false for real-time preview
+  useCdn: false, // Disable CDN during static builds so Vercel builds always get the fresh content instantly
   apiVersion: '2026-07-06',
 });
 
