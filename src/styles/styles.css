@@ -694,10 +694,14 @@ svg.giant .giant-rainbow{
 /* ============================================================
    PAGE FADE TRANSITIONS
    ============================================================ */
+html {
+  background-color: #111111;
+}
 body {
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.35s ease; /* fast fade-out */
 }
 .no-js body, body.page-ready {
   opacity: 1;
+  transition: opacity 0.75s ease-out; /* slower fade-in */
 }
