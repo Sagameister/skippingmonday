@@ -590,10 +590,7 @@ footer{
 /* giant wordmark — SVG text scales to exactly 100% width */
 .giant-wrap{ overflow:hidden; }
 svg.giant{ display:block; width:100%; height:auto; }
-svg.giant text{
-  font-family:'Inter Tight',sans-serif;
-  font-weight:600;
-  font-size: 92px;
+svg.giant path{
   fill: var(--cream);
   user-select:none;
 }

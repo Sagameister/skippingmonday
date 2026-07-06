@@ -515,7 +515,7 @@ header nav a.nav-link:hover::after{ width:100%; }
 .cover .clock-row{ border-bottom-color: rgba(255,248,240,.18); }
 .cover .clock-row time{ color: #9a9a9a; }
 .cover .foot-grid ul a:hover{ color: #9a9a9a; }
-.cover svg.giant text{ fill: var(--cream); }
+.cover svg.giant path{ fill: var(--cream); }
 .cover /* --- mailing list signup (footer) --- */
 .newsletter .nl-row{
   display:flex;
@@ -783,10 +783,7 @@ svg.giant{
   width:100%;                     /* fill the row... */
   height:auto;                    /* ...and keep the proportions */
 }
-svg.giant text{
-  font-family:'Inter Tight',sans-serif;
-  font-weight:600;
-  font-size: 92px;                /* in viewBox units, not screen pixels */
+svg.giant path{
   fill: var(--black);             /* SVG says "fill", not "color" */
   user-select:none;
 }
