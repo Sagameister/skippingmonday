@@ -35,10 +35,9 @@ export function TranslateAction(props: any) {
         return
       }
 
-      const response = await fetch('https://api-free.deepl.com/v2/translate', {
+      const response = await fetch('https://skippingmonday.vercel.app/api/translate', {
         method: 'POST',
         headers: {
-          'Authorization': 'DeepL-Auth-Key 6f95895f-c90d-4b6c-b4b7-c631fe79b629:fx',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
