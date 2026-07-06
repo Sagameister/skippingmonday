@@ -201,32 +201,38 @@ const pastGigs = gigs.filter(g => g.isPast);
             </figure>
             
             <div class="gig-details-meta">
-              <div class="meta-item">
-                <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
-                <span class="meta-value">{gig.time || '20:00'}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label" data-en="Setting" data-de="Location">Setting</span>
-                <span class="meta-value" data-en={gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'} data-de={gig.locationType === 'outdoors' ? 'Open Air' : 'Indoor'}>
-                  {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
-                </span>
-              </div>
+              {gig.time && (
+                <div class="meta-item">
+                  <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
+                  <span class="meta-value">{gig.time}</span>
+                </div>
+              )}
+              {gig.locationType && (
+                <div class="meta-item">
+                  <span class="meta-label" data-en="Setting" data-de="Location">Setting</span>
+                  <span class="meta-value" data-en={gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'} data-de={gig.locationType === 'outdoors' ? 'Open Air' : 'Indoor'}>
+                    {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
+                  </span>
+                </div>
+              )}
               {gig.priceEn && (
                 <div class="meta-item">
                   <span class="meta-label" data-en="Price" data-de="Eintritt">Price</span>
                   <span class="meta-value" data-en={gig.priceEn} data-de={gig.priceDe || gig.priceEn}>{gig.priceEn}</span>
                 </div>
               )}
-              <div class="meta-item">
-                <span class="meta-label" data-en="Tickets" data-de="Tickets">Tickets</span>
-                <span class="meta-value">
-                  {gig.soldOut ? (
-                    <span class="sold-out-badge" data-en="Sold Out" data-de="Ausverkauft">Sold Out</span>
-                  ) : (
-                    <a href={gig.ticketUrl || '#'} class="ticket-btn" target="_blank" rel="noopener noreferrer" data-en="Get Tickets" data-de="Tickets kaufen">Get Tickets</a>
-                  )}
-                </span>
-              </div>
+              {(gig.ticketUrl || gig.soldOut) && (
+                <div class="meta-item">
+                  <span class="meta-label" data-en="Tickets" data-de="Tickets">Tickets</span>
+                  <span class="meta-value">
+                    {gig.soldOut ? (
+                      <span class="sold-out-badge" data-en="Sold Out" data-de="Ausverkauft">Sold Out</span>
+                    ) : (
+                      <a href={gig.ticketUrl} class="ticket-btn" target="_blank" rel="noopener noreferrer" data-en="Get Tickets" data-de="Tickets kaufen">Get Tickets</a>
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
 
             {paragraphsEn.map((p, idx) => (
@@ -268,16 +274,20 @@ const pastGigs = gigs.filter(g => g.isPast);
                 </figure>
                 
                 <div class="gig-details-meta">
-                  <div class="meta-item">
-                    <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
-                    <span class="meta-value">{gig.time || '20:00'}</span>
-                  </div>
-                  <div class="meta-item">
-                    <span class="meta-label" data-en="Setting" data-de="Location">Setting</span>
-                    <span class="meta-value" data-en={gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'} data-de={gig.locationType === 'outdoors' ? 'Open Air' : 'Indoor'}>
-                      {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
-                    </span>
-                  </div>
+                  {gig.time && (
+                    <div class="meta-item">
+                      <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
+                      <span class="meta-value">{gig.time}</span>
+                    </div>
+                  )}
+                  {gig.locationType && (
+                    <div class="meta-item">
+                      <span class="meta-label" data-en="Setting" data-de="Location">Setting</span>
+                      <span class="meta-value" data-en={gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'} data-de={gig.locationType === 'outdoors' ? 'Open Air' : 'Indoor'}>
+                        {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
+                      </span>
+                    </div>
+                  )}
                   {gig.priceEn && (
                     <div class="meta-item">
                       <span class="meta-label" data-en="Price" data-de="Eintritt">Price</span>
