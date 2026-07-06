@@ -317,9 +317,11 @@ header nav a.nav-link.active::after{ width:100%; }
   margin-top: 14px;
 }
 .post-hero{
-  aspect-ratio: 16/10;
-  overflow:hidden;
   margin-bottom: 40px;
+}
+.post-hero img{
+  width: 100%;
+  height: auto;
 }
 .post-body p{
   max-width: 640px;
