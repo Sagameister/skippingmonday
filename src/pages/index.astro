@@ -1362,19 +1362,19 @@ for (let i = 0; i < COUNT; i++) {
   let opacity;
   let scale;
 
-  // Distribute textures, opacities, and sizes based on Z-depth
+  // Distribute textures, opacities, and sizes based on Z-depth (made much smaller and more subtle)
   if (z < -1.5) {
     textureList = textures.blurry;
-    opacity = 0.25 + (Math.random() * 0.15); // far back: blurry, dim
-    scale = 0.9 + (Math.random() * 0.4);     // blur makes them look larger
+    opacity = 0.15 + (Math.random() * 0.1); // far back: blurry, very dim
+    scale = 0.25 + (Math.random() * 0.15);  // small size
   } else if (z > 1.5) {
     textureList = textures.crisp;
-    opacity = 0.65 + (Math.random() * 0.2);  // up close: sharp, bright
-    scale = 0.4 + (Math.random() * 0.2);     // sharp is smaller/tighter
+    opacity = 0.45 + (Math.random() * 0.15); // up close: sharp, moderately bright
+    scale = 0.1 + (Math.random() * 0.05);   // tiny focused notes
   } else {
     textureList = textures.medium;
-    opacity = 0.45 + (Math.random() * 0.2);  // midground: medium blur
-    scale = 0.6 + (Math.random() * 0.3);
+    opacity = 0.3 + (Math.random() * 0.15);  // midground: subtle blur
+    scale = 0.15 + (Math.random() * 0.1);
   }
 
   // Pick a random musical note character
