@@ -690,3 +690,14 @@ svg.giant .giant-rainbow{
   letter-spacing: 0.05em;
   cursor: not-allowed;
 }
+
+/* ============================================================
+   PAGE FADE TRANSITIONS
+   ============================================================ */
+body {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.no-js body, body.page-ready {
+  opacity: 1;
+}

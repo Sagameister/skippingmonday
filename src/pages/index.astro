@@ -821,6 +821,17 @@ svg.giant .giant-rainbow{
   .photo-track .ph img{ height:auto; width:100%; }
   .slide-btn{ display:none; }
 }
+
+/* ============================================================
+   PAGE FADE TRANSITIONS
+   ============================================================ */
+body {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.no-js body, body.page-ready {
+  opacity: 1;
+}
 </style>
 <body>
 <Header />
@@ -1012,6 +1023,44 @@ svg.giant .giant-rainbow{
 </div><!-- /page-content -->
 
 <script is:inline define:vars={{ formattedSongs }}>
+/* ---------- page transitions (fade out on click, fade in on load) ---------- */
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  document.body.classList.add('page-ready');
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('page-ready');
+  });
+}
+
+function wirePageTransitions() {
+  document.querySelectorAll('a').forEach((link) => {
+    const href = link.getAttribute('href');
+    if (
+      href &&
+      !href.startsWith('#') &&
+      !href.startsWith('mailto:') &&
+      !href.startsWith('tel:') &&
+      link.target !== '_blank' &&
+      link.hostname === location.hostname
+    ) {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.body.classList.remove('page-ready');
+        setTimeout(() => {
+          location.href = href;
+        }, 350);
+      });
+    }
+  });
+}
+wirePageTransitions();
+
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    document.body.classList.add('page-ready');
+  }
+});
+
 /* ============================================================
    MOTION SYSTEM SETUP
    Values come from the Motion Stack Guide:

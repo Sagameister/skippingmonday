@@ -8,6 +8,44 @@
    its own inline script.
    ============================================================ */
 
+/* ---------- page transitions (fade out on click, fade in on load) ---------- */
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  document.body.classList.add('page-ready');
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('page-ready');
+  });
+}
+
+function wirePageTransitions() {
+  document.querySelectorAll('a').forEach((link) => {
+    const href = link.getAttribute('href');
+    if (
+      href &&
+      !href.startsWith('#') &&
+      !href.startsWith('mailto:') &&
+      !href.startsWith('tel:') &&
+      link.target !== '_blank' &&
+      link.hostname === location.hostname
+    ) {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.body.classList.remove('page-ready');
+        setTimeout(() => {
+          location.href = href;
+        }, 350);
+      });
+    }
+  });
+}
+wirePageTransitions();
+
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    document.body.classList.add('page-ready');
+  }
+});
+
 /* ---------- motion system setup ---------- */
 gsap.registerPlugin(ScrollTrigger, CustomEase);
 CustomEase.create('brand', '0.22, 1, 0.36, 1');   // the house easing curve
