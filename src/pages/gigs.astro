@@ -25,6 +25,8 @@ if (!gigs || gigs.length === 0) {
       time: '20:00',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: '€18',
+      priceDe: '18 €',
       soldOut: false,
       isPast: false,
       titleEn: 'Berlin — Lido, Kreuzberg',
@@ -41,6 +43,8 @@ if (!gigs || gigs.length === 0) {
       time: '21:00',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: '€15',
+      priceDe: '15 €',
       soldOut: false,
       isPast: false,
       titleEn: 'Hamburg — Molotow',
@@ -57,6 +61,8 @@ if (!gigs || gigs.length === 0) {
       time: '20:30',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: '€20',
+      priceDe: '20 €',
       soldOut: true,
       isPast: false,
       titleEn: 'Köln — Gebäude 9',
@@ -73,6 +79,8 @@ if (!gigs || gigs.length === 0) {
       time: '20:00',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: '€18',
+      priceDe: '18 €',
       soldOut: false,
       isPast: false,
       titleEn: 'München — Strom',
@@ -89,6 +97,8 @@ if (!gigs || gigs.length === 0) {
       time: '21:30',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: '€22',
+      priceDe: '22 €',
       soldOut: false,
       isPast: false,
       titleEn: 'Wien — Flex',
@@ -106,6 +116,8 @@ if (!gigs || gigs.length === 0) {
       time: '20:00',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: '€15',
+      priceDe: '15 €',
       soldOut: false,
       isPast: true,
       titleEn: 'Leipzig — UT Connewitz',
@@ -122,6 +134,8 @@ if (!gigs || gigs.length === 0) {
       time: '20:00',
       locationType: 'indoors',
       ticketUrl: '#',
+      priceEn: 'Free entry',
+      priceDe: 'Freier Eintritt',
       soldOut: false,
       isPast: true,
       titleEn: 'Berlin — Badehaus',
@@ -197,6 +211,12 @@ const pastGigs = gigs.filter(g => g.isPast);
                   {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
                 </span>
               </div>
+              {gig.priceEn && (
+                <div class="meta-item">
+                  <span class="meta-label" data-en="Price" data-de="Eintritt">Price</span>
+                  <span class="meta-value" data-en={gig.priceEn} data-de={gig.priceDe || gig.priceEn}>{gig.priceEn}</span>
+                </div>
+              )}
               <div class="meta-item">
                 <span class="meta-label" data-en="Tickets" data-de="Tickets">Tickets</span>
                 <span class="meta-value">
@@ -258,6 +278,12 @@ const pastGigs = gigs.filter(g => g.isPast);
                       {gig.locationType === 'outdoors' ? 'Outdoors' : 'Indoors'}
                     </span>
                   </div>
+                  {gig.priceEn && (
+                    <div class="meta-item">
+                      <span class="meta-label" data-en="Price" data-de="Eintritt">Price</span>
+                      <span class="meta-value" data-en={gig.priceEn} data-de={gig.priceDe || gig.priceEn}>{gig.priceEn}</span>
+                    </div>
+                  )}
                   <div class="meta-item">
                     <span class="meta-label" data-en="Status" data-de="Status">Status</span>
                     <span class="meta-value">

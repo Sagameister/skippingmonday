@@ -88,6 +88,20 @@ export default defineType({
       hidden: ({document}) => document?.postType !== 'gig'
     }),
     defineField({
+      name: 'priceEn',
+      title: 'Price (English)',
+      type: 'string',
+      description: 'e.g. Free, €15, or €15 at the door',
+      hidden: ({document}) => document?.postType !== 'gig'
+    }),
+    defineField({
+      name: 'priceDe',
+      title: 'Price (German)',
+      type: 'string',
+      description: 'z.B. Freier Eintritt, 15 € oder 15 € Abendkasse',
+      hidden: ({document}) => document?.postType !== 'gig'
+    }),
+    defineField({
       name: 'soldOut',
       title: 'Sold Out',
       type: 'boolean',
