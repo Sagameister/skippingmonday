@@ -1362,19 +1362,19 @@ for (let i = 0; i < COUNT; i++) {
   let opacity;
   let scale;
 
-  // Distribute textures, opacities, and sizes based on Z-depth (made much smaller and more subtle)
+  // Distribute textures, opacities, and sizes based on Z-depth (made a little larger and brighter)
   if (z < -1.5) {
     textureList = textures.blurry;
-    opacity = 0.15 + (Math.random() * 0.1); // far back: blurry, very dim
-    scale = 0.25 + (Math.random() * 0.15);  // small size
+    opacity = 0.15 + (Math.random() * 0.15); // far back: blurry, subtle glow
+    scale = 0.45 + (Math.random() * 0.2);    // slightly larger blurred notes
   } else if (z > 1.5) {
     textureList = textures.crisp;
-    opacity = 0.45 + (Math.random() * 0.15); // up close: sharp, moderately bright
-    scale = 0.1 + (Math.random() * 0.05);   // tiny focused notes
+    opacity = 0.5 + (Math.random() * 0.15);  // up close: sharp, bright
+    scale = 0.2 + (Math.random() * 0.1);     // middle size sharp notes
   } else {
     textureList = textures.medium;
-    opacity = 0.3 + (Math.random() * 0.15);  // midground: subtle blur
-    scale = 0.15 + (Math.random() * 0.1);
+    opacity = 0.35 + (Math.random() * 0.15); // midground: balanced
+    scale = 0.3 + (Math.random() * 0.15);
   }
 
   // Pick a random musical note character
@@ -1429,9 +1429,9 @@ if (prefersReduced) {
     sprites.forEach((sprite) => {
       const data = sprite.userData;
 
-      // Orbiting drift (gentle floating motion)
-      const driftX = Math.sin(t * 0.5 * data.speed + data.angle) * data.orbitRadius;
-      const driftY = Math.cos(t * 0.4 * data.speed + data.angle) * data.orbitRadius;
+      // Orbiting drift (slightly faster, smooth floating motion)
+      const driftX = Math.sin(t * 1.0 * data.speed + data.angle) * data.orbitRadius;
+      const driftY = Math.cos(t * 0.8 * data.speed + data.angle) * data.orbitRadius;
       const targetX = data.homeX + driftX;
       const targetY = data.homeY + driftY;
 
@@ -1451,9 +1451,9 @@ if (prefersReduced) {
         pushY = (dy / (dist || 0.001)) * force;
       }
 
-      // Smoothly ease position toward target + push force
-      sprite.position.x += (targetX + pushX - sprite.position.x) * 0.08;
-      sprite.position.y += (targetY + pushY - sprite.position.y) * 0.08;
+      // Smoothly ease position toward target + push force (snappier easing)
+      sprite.position.x += (targetX + pushX - sprite.position.x) * 0.12;
+      sprite.position.y += (targetY + pushY - sprite.position.y) * 0.12;
     });
 
     // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
