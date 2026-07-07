@@ -396,3 +396,116 @@ try {
   const saved = localStorage.getItem('sm-lang');
   if (saved && saved !== 'en') setLang(saved);
 } catch(e){}
+
+/* ---------- media page lightbox ---------- */
+const lightbox = document.getElementById('lightbox-modal');
+if (lightbox) {
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxCaption = document.getElementById('lightbox-caption');
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  const prevBtn = lightbox.querySelector('.lightbox-prev');
+  const nextBtn = lightbox.querySelector('.lightbox-next');
+  
+  // Gather all photo items
+  const photoItems = Array.from(document.querySelectorAll('.photo-item'));
+  let currentIndex = 0;
+
+  function openLightbox(index) {
+    currentIndex = index;
+    const item = photoItems[currentIndex];
+    if (!item) return;
+
+    const img = item.querySelector('img');
+    const fig = item.querySelector('figcaption');
+    
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt || '';
+    
+    // Set caption text using current language
+    const capText = fig ? (fig.getAttribute('data-' + currentLang) || fig.textContent) : '';
+    lightboxCaption.textContent = capText;
+    
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    
+    // Disable body scroll
+    document.body.style.overflow = 'hidden';
+    
+    // Stop Lenis ticker if active
+    if (window.lenis) window.lenis.stop();
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    
+    // Restore scroll
+    document.body.style.overflow = '';
+    if (window.lenis) window.lenis.start();
+  }
+
+  function showPrev() {
+    let prevIndex = currentIndex - 1;
+    if (prevIndex < 0) prevIndex = photoItems.length - 1;
+    openLightbox(prevIndex);
+  }
+
+  function showNext() {
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= photoItems.length) nextIndex = 0;
+    openLightbox(nextIndex);
+  }
+
+  // Bind clicks to triggers
+  photoItems.forEach((item, idx) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      openLightbox(idx);
+    });
+  });
+
+  // Bind controls
+  closeBtn.addEventListener('click', closeLightbox);
+  prevBtn.addEventListener('click', showPrev);
+  nextBtn.addEventListener('click', showNext);
+  
+  // Close on background click (clicking anything outside lightbox-content)
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      closeLightbox();
+    }
+  });
+
+  // Key navigation
+  addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') showPrev();
+    if (e.key === 'ArrowRight') showNext();
+  });
+
+  // Swipe support for mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightbox.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 50; // min distance in pixels to trigger a swipe
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        showPrev(); // swipe right -> show previous image
+      } else {
+        showNext(); // swipe left -> show next image
+      }
+    }
+  }
+}

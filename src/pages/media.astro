@@ -77,12 +77,23 @@ if (!photos || photos.length === 0) {
       {photos.map((ph) => {
         const imgUrl = ph.image ? urlFor(ph.image).url() : ph.staticImage;
         return (
-          <figure class="reveal-img">
-            <img src={imgUrl} alt={ph.captionEn} />
-            <figcaption data-en={ph.captionEn} data-de={ph.captionDe}>{ph.captionEn}</figcaption>
+          <figure class="reveal-img photo-item" style="cursor: pointer;">
+            <img src={imgUrl} alt={ph.captionEn || ''} />
+            <figcaption data-en={ph.captionEn || ''} data-de={ph.captionDe || ph.captionEn || ''}>{ph.captionEn || ''}</figcaption>
           </figure>
         );
       })}
     </div>
   </main>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox-modal" class="lightbox" aria-hidden="true" role="dialog">
+    <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+    <button class="lightbox-arrow lightbox-prev" aria-label="Previous photo">&#10094;</button>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="" />
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+    <button class="lightbox-arrow lightbox-next" aria-label="Next photo">&#10095;</button>
+  </div>
 </BaseLayout>
