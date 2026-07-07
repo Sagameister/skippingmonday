@@ -744,6 +744,15 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   user-select: none;
   -webkit-user-drag: none;
+  
+  /* Transition parameters: smooth zoom & fade */
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+  transform: scale(1);
+  opacity: 1;
+}
+.lightbox-content img.transitioning {
+  transform: scale(0.92);
+  opacity: 0;
 }
 .lightbox-caption {
   margin-top: 20px;

@@ -409,6 +409,7 @@ if (lightbox) {
   // Gather all photo items
   const photoItems = Array.from(document.querySelectorAll('.photo-item'));
   let currentIndex = 0;
+  let transitioning = false;
 
   function openLightbox(index) {
     currentIndex = index;
@@ -418,6 +419,10 @@ if (lightbox) {
     const img = item.querySelector('img');
     const fig = item.querySelector('figcaption');
     
+    // Ensure animation states are reset
+    lightboxImg.classList.remove('transitioning');
+    transitioning = false;
+
     lightboxImg.src = img.src;
     lightboxImg.alt = img.alt || '';
     
@@ -444,16 +449,45 @@ if (lightbox) {
     if (window.lenis) window.lenis.start();
   }
 
+  function navigateLightbox(index) {
+    if (transitioning) return;
+    transitioning = true;
+
+    // Zoom out and fade out the current image
+    lightboxImg.classList.add('transitioning');
+
+    setTimeout(() => {
+      currentIndex = index;
+      const item = photoItems[currentIndex];
+      if (item) {
+        const img = item.querySelector('img');
+        const fig = item.querySelector('figcaption');
+
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt || '';
+
+        const capText = fig ? (fig.getAttribute('data-' + currentLang) || fig.textContent) : '';
+        lightboxCaption.textContent = capText;
+      }
+      
+      // Zoom back in and fade back in
+      setTimeout(() => {
+        lightboxImg.classList.remove('transitioning');
+        transitioning = false;
+      }, 50);
+    }, 250); // Matches the CSS transition duration
+  }
+
   function showPrev() {
     let prevIndex = currentIndex - 1;
     if (prevIndex < 0) prevIndex = photoItems.length - 1;
-    openLightbox(prevIndex);
+    navigateLightbox(prevIndex);
   }
 
   function showNext() {
     let nextIndex = currentIndex + 1;
     if (nextIndex >= photoItems.length) nextIndex = 0;
-    openLightbox(nextIndex);
+    navigateLightbox(nextIndex);
   }
 
   // Bind clicks to triggers
