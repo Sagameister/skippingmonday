@@ -1098,10 +1098,15 @@ if (window.Lenis && !prefersReduced) {
   // every time Lenis scrolls, tell ScrollTrigger "we moved!"
   lenis.on('scroll', ScrollTrigger.update);
 
-  // let GSAP's heartbeat (its "ticker") drive Lenis, so both
-  // libraries share one clock — this prevents stutter
-  gsap.ticker.add((time) => { lenis.raf(time * 1000); });  // Lenis wants milliseconds
-  gsap.ticker.lagSmoothing(0);
+  // Use the standard high-performance requestAnimationFrame loop for Lenis
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  // Expose globally
+  window.lenis = lenis;
 }
 
 /* --- header theme: white over the hero photo, black after it --- */

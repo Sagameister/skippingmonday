@@ -56,8 +56,16 @@ let lenis = null;
 if (window.Lenis && !prefersReduced) {
   lenis = new Lenis({ duration: 1.2, smoothWheel: true });
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-  gsap.ticker.lagSmoothing(0);
+  
+  // Use the standard high-performance requestAnimationFrame loop for Lenis
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+  
+  // Expose globally so other components (like lightbox) can stop/start it
+  window.lenis = lenis;
 }
 
 /* ---------- header: highlight the page you're on ---------- */
