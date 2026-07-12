@@ -27,6 +27,13 @@ export default defineType({
       description: 'URL of the video to open/play',
       validation: Rule => Rule.required(),
     }),
+    defineField({
+      name: 'isFeatured',
+      title: 'Featured on Homepage',
+      type: 'boolean',
+      initialValue: false,
+      description: 'If checked, this video will also appear in the hero slider on the homepage.',
+    }),
   ],
   preview: {
     select: {

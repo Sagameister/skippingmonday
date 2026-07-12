@@ -9,10 +9,26 @@ const hasSanity = isSanityConfigured;
 let heroSongs = [];
 let featuredGigsForHero = [];
 let featuredNewsForHero = [];
+let featuredPhotosForHero = [];
+let featuredVideosForHero = [];
 let gigs = [];
 let newsArticles = [];
 let photos = [];
 let videos = [];
+
+const getEmbedSrc = (url) => {
+  const ytReg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const ytMatch = url ? url.match(ytReg) : null;
+  const ytId = (ytMatch && ytMatch[2].length === 11) ? ytMatch[2] : null;
+
+  const vimReg = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+  const vimMatch = url ? url.match(vimReg) : null;
+  const vimId = vimMatch ? vimMatch[1] : null;
+
+  if (ytId) return { type: 'youtube', id: ytId, src: `https://www.youtube.com/embed/${ytId}` };
+  if (vimId) return { type: 'vimeo', id: vimId, src: `https://player.vimeo.com/video/${vimId}` };
+  return null;
+};
 
 function formatGigDate(dateStr, lang) {
   if (!dateStr) return '';
@@ -33,6 +49,8 @@ if (hasSanity) {
     heroSongs = await sanityClient.fetch(`*[_type == "song" && isFeatured == true]`);
     featuredGigsForHero = await sanityClient.fetch(`*[_type == "post" && postType == "gig" && !isPast && isFeatured == true] | order(date asc)`);
     featuredNewsForHero = await sanityClient.fetch(`*[_type == "post" && postType == "news" && isFeatured == true] | order(date desc)`);
+    featuredPhotosForHero = await sanityClient.fetch(`*[_type == "photo" && isFeatured == true]`);
+    featuredVideosForHero = await sanityClient.fetch(`*[_type == "video" && isFeatured == true]`);
     
     gigs = await sanityClient.fetch(`*[_type == "post" && postType == "gig" && !isPast && isFeatured == true] | order(date asc)[0..4]`);
     if (!gigs || gigs.length === 0) {
@@ -60,8 +78,9 @@ let sliderItems = [];
 // 1. Add featured songs from CMS
 if (heroSongs && heroSongs.length > 0) {
   sliderItems.push(...heroSongs.map(s => ({
-    label: { en: s.categoryEn || 'Announcement', de: s.categoryDe || 'Ankündigung' },
-    text: { en: s.titleEn, de: s.titleDe }
+    label: { en: s.categoryEn || 'Song', de: s.categoryDe || 'Song' },
+    text: { en: s.titleEn, de: s.titleDe },
+    image: s.coverImage ? urlFor(s.coverImage).url() : '/Images/hero.jpg'
   })));
 }
 
@@ -77,7 +96,8 @@ if (featuredGigsForHero && featuredGigsForHero.length > 0) {
       text: { 
         en: `${city}${city && venueName ? ' — ' : ''}${venueName}${dateEn ? ` · ${dateEn}` : ''}`,
         de: `${city}${city && venueName ? ' — ' : ''}${venueName}${dateDe ? ` · ${dateDe}` : ''}`
-      }
+      },
+      image: g.coverImage ? urlFor(g.coverImage).url() : '/Images/hero.jpg'
     };
   }));
 }
@@ -86,18 +106,42 @@ if (featuredGigsForHero && featuredGigsForHero.length > 0) {
 if (featuredNewsForHero && featuredNewsForHero.length > 0) {
   sliderItems.push(...featuredNewsForHero.map(n => ({
     label: { en: 'Announcement', de: 'Ankündigung' },
-    text: { en: n.titleEn, de: n.titleDe }
+    text: { en: n.titleEn, de: n.titleDe },
+    image: n.coverImage ? urlFor(n.coverImage).url() : '/Images/hero.jpg'
   })));
+}
+
+// 4. Add featured photos from CMS
+if (featuredPhotosForHero && featuredPhotosForHero.length > 0) {
+  sliderItems.push(...featuredPhotosForHero.map(ph => ({
+    label: { en: 'Photo', de: 'Foto' },
+    text: { en: ph.captionEn, de: ph.captionDe },
+    image: ph.image ? urlFor(ph.image).url() : '/Images/hero.jpg'
+  })));
+}
+
+// 5. Add featured videos from CMS
+if (featuredVideosForHero && featuredVideosForHero.length > 0) {
+  sliderItems.push(...featuredVideosForHero.map(vid => {
+    const embed = getEmbedSrc(vid.videoUrl);
+    const ytThumb = (embed && embed.type === 'youtube') ? `https://img.youtube.com/vi/${embed.id}/maxresdefault.jpg` : '';
+    const imgUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : (ytThumb || '/Images/hero.jpg');
+    return {
+      label: { en: 'Video', de: 'Video' },
+      text: { en: vid.titleEn, de: vid.titleDe },
+      image: imgUrl
+    };
+  }));
 }
 
 // Fallback to static items if no custom items are featured anywhere
 if (sliderItems.length === 0) {
   formattedSongs = [
-    { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Berlin — Lido · Sep 12', de:'Berlin — Lido · 12. Sep'} },
-    { label: {en:'New release',   de:'Neue Single'}, text: {en:'“Call In Sad” — out now', de:'„Call In Sad“ — jetzt draußen'} },
-    { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'The No-Alarm Tour — 5 cities', de:'Die No-Alarm-Tour — 5 Städte'} },
-    { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Hamburg — Molotow · Sep 19', de:'Hamburg — Molotow · 19. Sep'} },
-    { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'Köln is sold out — danke!', de:'Köln ist ausverkauft — danke!'} }
+    { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Berlin — Lido · Sep 12', de:'Berlin — Lido · 12. Sep'}, image: '/Images/hero.jpg' },
+    { label: {en:'New release',   de:'Neue Single'}, text: {en:'“Call In Sad” — out now', de:'„Call In Sad“ — jetzt draußen'}, image: '/Images/hero.jpg' },
+    { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'The No-Alarm Tour — 5 cities', de:'Die No-Alarm-Tour — 5 Städte'}, image: '/Images/hero.jpg' },
+    { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Hamburg — Molotow · Sep 19', de:'Hamburg — Molotow · 19. Sep'}, image: '/Images/hero.jpg' },
+    { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'Köln is sold out — danke!', de:'Köln ist ausverkauft — danke!'}, image: '/Images/hero.jpg' }
   ];
 } else {
   formattedSongs = sliderItems;
@@ -609,7 +653,18 @@ header nav a.nav-link:hover::after{ width:100%; }
 
 .legal{ color: #9a9a9a; }
 .cover .legal a:hover{ color: var(--cream); }
-.hero img{ position:absolute; inset:0; }
+.hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+.hero-bg-img.active {
+  opacity: 1;
+}
 /* soft dark wash so white text is readable on any photo */
 .hero::after{
   content:'';
@@ -899,12 +954,12 @@ body {
 
 <!-- ===================== HOME / HERO ===================== -->
 <div class="hero">
-  <!-- the band's own photo, kept in the Images folder.
-       If it's ever missing, onerror quietly loads a placeholder
-       instead so the site never looks broken. -->
-  <img src="/Images/hero.jpg"
+  <img id="hero-bg-1" class="hero-bg-img active" src="/Images/hero.jpg"
        onerror="this.onerror=null; this.src='https://picsum.photos/seed/stagelights/1920/1200';"
-       alt="Skipping Mondays — soundcheck on stage, view from behind the drum kit">
+       alt="Skipping Mondays — stage soundcheck">
+  <img id="hero-bg-2" class="hero-bg-img" src="/Images/hero.jpg"
+       onerror="this.onerror=null; this.src='https://picsum.photos/seed/stagelights/1920/1200';"
+       alt="Skipping Mondays — stage soundcheck">
   <div class="cycle">
     <!-- both of these are driven by the rotation in PART 2 of the script;
          the data attributes keep the DE/EN switcher in sync -->
@@ -1356,6 +1411,22 @@ function renderHeroItem(animated){
 
   heroLabelEl.textContent = item.label[currentLang];
   titleEl.textContent     = item.text[currentLang];
+
+  // Dynamic background image crossfade
+  const bg1 = document.getElementById('hero-bg-1');
+  const bg2 = document.getElementById('hero-bg-2');
+  if (bg1 && bg2) {
+    const nextBg = bg1.classList.contains('active') ? bg2 : bg1;
+    const currentBg = bg1.classList.contains('active') ? bg1 : bg2;
+
+    const img = new Image();
+    img.src = item.image || '/Images/hero.jpg';
+    img.onload = () => {
+      nextBg.src = img.src;
+      nextBg.classList.add('active');
+      currentBg.classList.remove('active');
+    };
+  }
 
   if (!animated || prefersReduced) return;    // plain text is enough
   splitWords(titleEl);                        // wrap each word in a mask

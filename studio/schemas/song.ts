@@ -34,6 +34,14 @@ export default defineType({
       validation: Rule => Rule.required(),
     }),
     defineField({
+      name: 'coverImage',
+      title: 'Cover Image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
       name: 'isFeatured',
       title: 'Featured in Homepage Slider',
       type: 'boolean',
