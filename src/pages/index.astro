@@ -26,8 +26,8 @@ if (hasSanity) {
       newsArticles = await sanityClient.fetch(`*[_type == "post" && postType == "news"] | order(date desc)[0..4]`);
     }
     
-    photos = await sanityClient.fetch(`*[_type == "photo" && isFeatured == true] | order(order asc, _createdAt desc)`);
-    videos = await sanityClient.fetch(`*[_type == "video"] | order(order asc, _createdAt desc)[0...3]`);
+    photos = await sanityClient.fetch(`*[_type == "photo" && isFeatured == true] | order(orderRank asc)`);
+    videos = await sanityClient.fetch(`*[_type == "video"] | order(orderRank asc)[0...3]`);
   } catch (err) {
     console.error("Sanity fetch homepage data error:", err);
   }

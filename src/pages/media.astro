@@ -9,8 +9,8 @@ let photos = [];
 
 if (hasSanity) {
   try {
-    videos = await sanityClient.fetch(`*[_type == "video"] | order(order asc, _createdAt desc)`);
-    photos = await sanityClient.fetch(`*[_type == "photo"] | order(order asc, _createdAt desc)`);
+    videos = await sanityClient.fetch(`*[_type == "video"] | order(orderRank asc)`);
+    photos = await sanityClient.fetch(`*[_type == "photo"] | order(orderRank asc)`);
   } catch (err) {
     console.error("Sanity fetch error for media:", err);
   }
