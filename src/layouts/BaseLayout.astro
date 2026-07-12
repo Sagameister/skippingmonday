@@ -17,6 +17,17 @@ const { title } = Astro.props;
     <Header />
     <slot />
     <Footer />
+
+    <!-- Video Lightbox Modal -->
+    <div id="video-lightbox" class="video-lightbox" aria-hidden="true" role="dialog">
+      <button class="v-close-btn" aria-label="Close video player">&times;</button>
+      <div class="v-lightbox-content">
+        <div class="v-wrapper">
+          <iframe id="v-lightbox-iframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+
     <script is:inline src="/site.js"></script>
   </body>
 </html>

@@ -539,3 +539,77 @@ if (lightbox) {
     }
   }
 }
+
+/* ---------- global video lightbox ---------- */
+const videoLightbox = document.getElementById('video-lightbox');
+if (videoLightbox) {
+  const vIframe = document.getElementById('v-lightbox-iframe');
+  const closeBtn = videoLightbox.querySelector('.v-close-btn');
+
+  function getYoutubeId(url) {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  }
+
+  function getVimeoId(url) {
+    if (!url) return null;
+    const regExp = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  }
+
+  function openVideo(url) {
+    let embedUrl = '';
+    const ytId = getYoutubeId(url);
+    const vimId = getVimeoId(url);
+
+    if (ytId) {
+      embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+    } else if (vimId) {
+      embedUrl = `https://player.vimeo.com/video/${vimId}?autoplay=1`;
+    } else {
+      embedUrl = url;
+    }
+
+    if (vIframe) vIframe.src = embedUrl;
+    videoLightbox.setAttribute('aria-hidden', 'false');
+    if (window.lenis) window.lenis.stop();
+  }
+
+  function closeVideo() {
+    videoLightbox.setAttribute('aria-hidden', 'true');
+    if (vIframe) vIframe.src = '';
+    if (window.lenis) window.lenis.start();
+  }
+
+  // Intercept click on video items on both homepage and media page
+  document.addEventListener('click', (e) => {
+    const videoLink = e.target.closest('.video-grid a');
+    if (videoLink) {
+      e.preventDefault();
+      const url = videoLink.getAttribute('href');
+      if (url && url !== '#') {
+        openVideo(url);
+      }
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeVideo);
+  }
+
+  videoLightbox.addEventListener('click', (e) => {
+    if (e.target === videoLightbox) {
+      closeVideo();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && videoLightbox.getAttribute('aria-hidden') === 'false') {
+      closeVideo();
+    }
+  });
+}
+
