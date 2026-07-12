@@ -33,6 +33,13 @@ export default defineType({
       description: 'e.g. Nächstes Konzert, Neue Single, Ankündigung',
       validation: Rule => Rule.required(),
     }),
+    defineField({
+      name: 'isFeatured',
+      title: 'Featured in Homepage Slider',
+      type: 'boolean',
+      initialValue: true,
+      description: 'If checked, this item will appear in the cycling text slider on the homepage hero section.',
+    }),
   ],
   preview: {
     select: {

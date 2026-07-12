@@ -60,6 +60,13 @@ export default defineType({
       type: 'text',
       rows: 6,
     }),
+    defineField({
+      name: 'isFeatured',
+      title: 'Featured on Homepage',
+      type: 'boolean',
+      initialValue: true,
+      description: 'If checked, this post will be prioritized to appear in the respective section on the homepage.',
+    }),
     
     // Gig-specific fields (hidden if postType is news)
     defineField({
