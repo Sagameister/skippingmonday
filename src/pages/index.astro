@@ -132,6 +132,8 @@ img{ display:block; width:100%; height:100%; object-fit:cover; }
      extends the mask downward without changing the layout */
   padding-bottom:.22em;   /* room for deep descenders like y, g, p */
   margin-bottom:-.22em;   /* cancels the padding so layout doesn't shift */
+  padding-right:.08em;    /* room for italics/letter-spacing clipping */
+  margin-right:-.08em;    /* cancels the padding so layout doesn't shift */
 }
 .w-inner{ display:inline-block; will-change: transform; }
 
