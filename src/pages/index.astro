@@ -24,14 +24,7 @@ if (hasSanity) {
   }
 }
 
-// Fallback for videos if empty
-if (!videos || videos.length === 0) {
-  videos = [
-    { titleEn: '“Call In Sad” — Official Video', titleDe: '„Call In Sad“ — Offizielles Video', videoUrl: 'https://www.youtube.com/watch?v=VuqX7CJvzVA', staticImage: 'https://picsum.photos/seed/video5/1600/900' },
-    { titleEn: 'Tiny Kitchen Session', titleDe: 'Tiny Kitchen Session', videoUrl: 'https://www.youtube.com/watch?v=bZXqIZsI62k', staticImage: 'https://picsum.photos/seed/kitchen/1600/900' },
-    { titleEn: 'Live at Molotow — Full Set', titleDe: 'Live im Molotow — Ganzes Set', videoUrl: 'https://www.youtube.com/watch?v=CRIuX1WswC4', staticImage: 'https://picsum.photos/seed/livefull/1600/900' }
-  ];
-}
+if (!videos) videos = [];
 
 // Prepare cycling song items for client script
 let formattedSongs = [];
@@ -72,16 +65,7 @@ if (!newsArticles || newsArticles.length === 0) {
   ];
 }
 
-// Fallback for photos
-if (!photos || photos.length === 0) {
-  photos = [
-    { captionEn: 'Live at Molotow, Hamburg', captionDe: 'Live im Molotow, Hamburg', staticImage: 'https://picsum.photos/seed/concert1/900/1100' },
-    { captionEn: 'Studio session, Neukölln', captionDe: 'Studio-Session, Neukölln', staticImage: 'https://picsum.photos/seed/studio2/900/900' },
-    { captionEn: 'Band portrait, 2026', captionDe: 'Bandporträt, 2026', staticImage: 'https://picsum.photos/seed/portrait3/900/900' },
-    { captionEn: 'The crowd, Gebäude 9', captionDe: 'Das Publikum, Gebäude 9', staticImage: 'https://picsum.photos/seed/crowd4/1200/900' },
-    { captionEn: 'Backstage, München', captionDe: 'Backstage, München', staticImage: 'https://picsum.photos/seed/backstage/1600/900' }
-  ];
-}
+if (!photos) photos = [];
 
 // Helper to format date to DD.MM.YYYY
 function formatDate(dateStr: string) {

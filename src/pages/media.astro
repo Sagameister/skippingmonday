@@ -16,31 +16,8 @@ if (hasSanity) {
   }
 }
 
-// Fallback for videos if empty
-if (!videos || videos.length === 0) {
-  videos = [
-    { titleEn: '“Call In Sad” — Official Video', titleDe: '„Call In Sad“ — Offizielles Video', videoUrl: 'https://www.youtube.com/watch?v=VuqX7CJvzVA', staticImage: 'https://picsum.photos/seed/video5/1600/900' },
-    { titleEn: 'Tiny Kitchen Session', titleDe: 'Tiny Kitchen Session', videoUrl: 'https://www.youtube.com/watch?v=bZXqIZsI62k', staticImage: 'https://picsum.photos/seed/kitchen/1600/900' },
-    { titleEn: 'Live at Molotow — Full Set', titleDe: 'Live im Molotow — Ganzes Set', videoUrl: 'https://www.youtube.com/watch?v=CRIuX1WswC4', staticImage: 'https://picsum.photos/seed/livefull/1600/900' },
-    { titleEn: 'No-Alarm Tour — Documentary', titleDe: 'No-Alarm-Tour — Doku', videoUrl: 'https://www.youtube.com/watch?v=zxjaIukw6HE', staticImage: 'https://picsum.photos/seed/tourdoc/1600/900' },
-    { titleEn: '“Tuesday Feels” — Lyric Video', titleDe: '„Tuesday Feels“ — Lyric-Video', videoUrl: 'https://www.youtube.com/watch?v=bZXqIZsI62k', staticImage: 'https://picsum.photos/seed/lyricvid/1600/900' },
-    { titleEn: 'Acoustic at Dawn (One Take)', titleDe: 'Akustisch im Morgengrauen (One Take)', videoUrl: 'https://www.youtube.com/watch?v=CRIuX1WswC4', staticImage: 'https://picsum.photos/seed/acoustic/1600/900' }
-  ];
-}
-
-// Fallback for photos if empty
-if (!photos || photos.length === 0) {
-  photos = [
-    { captionEn: 'Live at Molotow, Hamburg', captionDe: 'Live im Molotow, Hamburg', staticImage: 'https://picsum.photos/seed/concert1/900/1100' },
-    { captionEn: 'Studio session, Neukölln', captionDe: 'Studio-Session, Neukölln', staticImage: 'https://picsum.photos/seed/studio2/900/900' },
-    { captionEn: 'Band portrait, 2026', captionDe: 'Bandporträt, 2026', staticImage: 'https://picsum.photos/seed/portrait3/900/1200' },
-    { captionEn: 'The crowd, Gebäude 9', captionDe: 'Das Publikum, Gebäude 9', staticImage: 'https://picsum.photos/seed/crowd4/1200/900' },
-    { captionEn: 'Backstage, München', captionDe: 'Backstage, München', staticImage: 'https://picsum.photos/seed/backstage/1600/900' },
-    { captionEn: 'Soundcheck, Wien', captionDe: 'Soundcheck, Wien', staticImage: 'https://picsum.photos/seed/soundcheck/900/1000' },
-    { captionEn: 'Van life between cities', captionDe: 'Van-Leben zwischen Städten', staticImage: 'https://picsum.photos/seed/vanlife/1200/800' },
-    { captionEn: 'Confetti, last song', captionDe: 'Konfetti, letzter Song', staticImage: 'https://picsum.photos/seed/confetti/900/1300' }
-  ];
-}
+if (!videos) videos = [];
+if (!photos) photos = [];
 ---
 <BaseLayout title="Media — Skipping Mondays">
   <!-- ===================== PAGE HERO ===================== -->
