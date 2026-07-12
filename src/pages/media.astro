@@ -56,14 +56,34 @@ if (!photos || photos.length === 0) {
     <div class="video-grid">
       {videos.map((vid) => {
         const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : vid.staticImage;
+        const ytReg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const ytMatch = vid.videoUrl ? vid.videoUrl.match(ytReg) : null;
+        const ytId = (ytMatch && ytMatch[2].length === 11) ? ytMatch[2] : null;
+
+        const vimReg = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+        const vimMatch = vid.videoUrl ? vid.videoUrl.match(vimReg) : null;
+        const vimId = vimMatch ? vimMatch[1] : null;
+
+        let embedSrc = '';
+        if (ytId) {
+          embedSrc = `https://www.youtube.com/embed/${ytId}`;
+        } else if (vimId) {
+          embedSrc = `https://player.vimeo.com/video/${vimId}`;
+        }
         return (
           <figure class="vid reveal-img" data-reveal>
-            <a href={vid.videoUrl} aria-label={`Play: ${vid.titleEn}`}>
-              <span class="v-thumb">
+            <div class="v-embed-wrapper">
+              {embedSrc ? (
+                <iframe
+                  title={vid.titleEn}
+                  src={embedSrc}
+                  loading="lazy"
+                  allowfullscreen
+                ></iframe>
+              ) : (
                 <img src={thumbUrl} alt={vid.titleEn} />
-                <span class="play">▶</span>
-              </span>
-            </a>
+              )}
+            </div>
             <figcaption data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</figcaption>
           </figure>
         );
