@@ -267,19 +267,7 @@ if (tickerTrack && !prefersReduced){
   });
 }
 
-/* ---------- footer: live city clocks ---------- */
-function cityTime(timeZone){
-  return new Intl.DateTimeFormat('de-DE', { hour:'2-digit', minute:'2-digit', timeZone }).format(new Date());
-}
-function updateClocks(){
-  const b = document.getElementById('clock-berlin');
-  if (!b) return;
-  b.textContent = cityTime('Europe/Berlin');
-  document.getElementById('clock-london').textContent = cityTime('Europe/London');
-  document.getElementById('clock-ny').textContent     = cityTime('America/New_York');
-}
-updateClocks();
-setInterval(updateClocks, 30000);
+
 
 /* ---------- footer: rainbow Easter egg (cursor-chasing rings) ---------- */
 const rainbowGrad = document.getElementById('rainbow');

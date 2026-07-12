@@ -3,22 +3,80 @@ interface Props {
   id?: string;
 }
 const { id } = Astro.props;
+
+import { sanityClient, isSanityConfigured } from '../lib/sanity';
+
+const hasSanity = isSanityConfigured;
+let gigs = [];
+
+if (hasSanity) {
+  try {
+    gigs = await sanityClient.fetch(`*[_type == "post" && postType == "gig" && !isPast] | order(date asc)[0...10]`);
+  } catch (err) {
+    console.error("Sanity fetch error for footer clocks:", err);
+  }
+}
+
+// Timezone mapping for gig cities
+const timezoneMap: Record<string, string> = {
+  'berlin': 'Europe/Berlin',
+  'hamburg': 'Europe/Berlin',
+  'köln': 'Europe/Berlin',
+  'münchen': 'Europe/Berlin',
+  'heidelberg': 'Europe/Berlin',
+  'wien': 'Europe/Berlin',
+  'vienna': 'Europe/Berlin',
+  'london': 'Europe/London',
+  'new york': 'America/New_York',
+  'mexico city': 'America/Mexico_City',
+  'mexico': 'America/Mexico_City',
+  'hanoi': 'Asia/Ho_Chi_Minh',
+  'tokyo': 'Asia/Tokyo',
+  'sydney': 'Australia/Sydney'
+};
+
+const uniqueCities: Array<{ name: string; timezone: string }> = [];
+const seen = new Set();
+for (const gig of gigs) {
+  if (!gig.city) continue;
+  const normalized = gig.city.trim().toLowerCase();
+  if (!seen.has(normalized)) {
+    seen.add(normalized);
+    const tz = timezoneMap[normalized] || 'Europe/Berlin';
+    uniqueCities.push({ name: gig.city.trim(), timezone: tz });
+    if (uniqueCities.length >= 3) break;
+  }
+}
+
+const fallbackCities = [
+  { name: 'Berlin', timezone: 'Europe/Berlin' },
+  { name: 'London', timezone: 'Europe/London' },
+  { name: 'New York', timezone: 'America/New_York' }
+];
+
+const citiesToShow = [...uniqueCities];
+for (const fb of fallbackCities) {
+  if (citiesToShow.length >= 3) break;
+  if (!seen.has(fb.name.toLowerCase())) {
+    citiesToShow.push(fb);
+  }
+}
 ---
 <!-- ===================== FOOTER ===================== -->
 <footer id={id}>
   <div class="foot-grid">
     <div>
       <span class="micro" data-en="On the road" data-de="Unterwegs">On the road</span>
-      <div class="clock-row"><span>Berlin</span>   <time id="clock-berlin">--:--</time></div>
-      <div class="clock-row"><span>London</span>   <time id="clock-london">--:--</time></div>
-      <div class="clock-row"><span>New York</span> <time id="clock-ny">--:--</time></div>
+      {citiesToShow.map((cityObj) => (
+        <div class="clock-row">
+          <span>{cityObj.name}</span>
+          <time class="city-clock" data-tz={cityObj.timezone}>--:--</time>
+        </div>
+      ))}
     </div>
     <div>
       <span class="micro" data-en="Booking" data-de="Booking">Booking</span>
       <a class="mail email-protect" data-user="booking" data-domain="skippingmondays.example">booking [at] skippingmondays.example</a>
-      <p style="margin-top:18px; font-size:13px; color:var(--muted);">
-        <span data-en="Management: Mel Okafor" data-de="Management: Mel Okafor">Management: Mel Okafor</span>
-      </p>
     </div>
     <div>
       <span class="micro" data-en="Mailing list" data-de="Newsletter">Mailing list</span>
@@ -77,3 +135,21 @@ const { id } = Astro.props;
     </span>
   </div>
 </footer>
+
+<script is:inline>
+  function cityTime(timeZone){
+    try {
+      return new Intl.DateTimeFormat('de-DE', { hour:'2-digit', minute:'2-digit', timeZone }).format(new Date());
+    } catch(e) {
+      return '--:--';
+    }
+  }
+  function updateClocks(){
+    document.querySelectorAll('.city-clock').forEach((clock) => {
+      const tz = clock.getAttribute('data-tz');
+      if (tz) clock.textContent = cityTime(tz);
+    });
+  }
+  updateClocks();
+  setInterval(updateClocks, 30000);
+</script>

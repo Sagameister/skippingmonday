@@ -1851,23 +1851,7 @@ addEventListener('resize', () => {
 });
 startAuto();
 
-/* ============================================================
-   PART 5 — LIVE CITY CLOCKS (plain JavaScript)
-   Intl.DateTimeFormat can tell the time in any timezone —
-   no math needed, the browser does it all.
-   ============================================================ */
-function cityTime(timeZone){
-  return new Intl.DateTimeFormat('de-DE', {
-    hour: '2-digit', minute: '2-digit', timeZone
-  }).format(new Date());
-}
-function updateClocks(){
-  document.getElementById('clock-berlin').textContent = cityTime('Europe/Berlin');
-  document.getElementById('clock-london').textContent = cityTime('Europe/London');
-  document.getElementById('clock-ny').textContent     = cityTime('America/New_York');
-}
-updateClocks();                  // run immediately
-setInterval(updateClocks, 30000); // refresh every 30 seconds
+
 
 // newsletter signup: honeypot + "not connected yet" notice + fetch
 // (same recipe as the contact page form — see site.js for details)
