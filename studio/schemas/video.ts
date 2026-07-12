@@ -24,20 +24,10 @@ export default defineType({
       description: 'URL of the video to open/play',
       validation: Rule => Rule.required(),
     }),
-    defineField({
-      name: 'thumbnail',
-      title: 'Thumbnail Image',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      validation: Rule => Rule.required(),
-    }),
   ],
   preview: {
     select: {
       title: 'titleEn',
-      media: 'thumbnail',
     },
   },
 })
