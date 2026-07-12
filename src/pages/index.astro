@@ -655,9 +655,10 @@ header nav a.nav-link:hover::after{ width:100%; }
 .cover .legal a:hover{ color: var(--cream); }
 .hero-bg-img {
   position: absolute;
-  inset: 0;
+  top: -6%;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: 112%;
   object-fit: cover;
   opacity: 0;
   transition: opacity 1.2s ease-in-out;
@@ -1690,7 +1691,7 @@ gsap.delayedCall(.4, () => renderHeroItem(true));  // first hero item mask-revea
 // --- Pattern 5: hero parallax — photo drifts while being covered.
 // All hero scroll effects are driven by the SPACER's progress,
 // because the fixed hero itself never moves.
-gsap.to('.hero img', {
+gsap.to('.hero-bg-img', {
   scrollTrigger: { trigger: '.hero-spacer', start: 'top top', end: 'bottom top', scrub: true },
   yPercent: 6, ease: 'none'   // the 1.12 oversize gives it room to move
 });
