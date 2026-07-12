@@ -66,7 +66,7 @@ header{
   color: var(--nav-ink);
 }
 header .wordmark{ display:flex; align-items:center; }
-header .wordmark img{ height: 44px; width:auto; display:block; object-fit:contain; }
+header .wordmark img{ height: 54px; width:auto; display:block; object-fit:contain; }
 header nav{ display:flex; align-items:center; gap: 44px; }
 header nav a.nav-link{
   color: var(--nav-ink);
