@@ -376,15 +376,13 @@ header nav a.nav-link.active::after{ width:100%; }
    MEDIA PAGE — video grid + masonry photo wall
    ============================================================ */
 .video-grid{
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  justify-content: center;
   width: 100%;
 }
 .video-grid .vid {
-  flex: 1 1 320px;
-  max-width: 480px;
+  width: 100%;
   display: block;
 }
 .v-embed-wrapper {
