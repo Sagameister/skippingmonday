@@ -82,6 +82,13 @@ export default defineType({
       hidden: ({document}) => document?.postType !== 'gig'
     }),
     defineField({
+      name: 'address',
+      title: 'Address',
+      type: 'string',
+      description: 'Full address of the venue for the Google Maps embed (e.g., Cuvrystraße 7, 10997 Berlin)',
+      hidden: ({document}) => document?.postType !== 'gig'
+    }),
+    defineField({
       name: 'ticketUrl',
       title: 'Ticket URL',
       type: 'url',

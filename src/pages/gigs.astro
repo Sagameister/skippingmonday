@@ -243,6 +243,19 @@ const pastGigs = gigs.filter(g => g.isPast);
                 {p}
               </p>
             ))}
+
+            {gig.address && (
+              <div class="gig-map-container" data-reveal>
+                <iframe
+                  title={`Map of ${gig.venue || 'Venue'}`}
+                  class="gig-map"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(gig.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  allowfullscreen
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            )}
           </div>
         </article>
       );

@@ -834,3 +834,30 @@ html.lenis, html.lenis body {
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
+
+/* ============================================================
+   GOOGLE MAP EMBED
+   ============================================================ */
+.gig-map-container {
+  width: 100%;
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--nav-contrast);
+  aspect-ratio: 16 / 9;
+  max-height: 350px;
+}
+.gig-map {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: invert(90%) hue-rotate(180deg) grayscale(45%); /* matches the sleek dark aesthetic! */
+  opacity: 0.8;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+.gig-map:hover {
+  opacity: 1;
+  filter: none; /* turns normal on hover! */
+}
+
