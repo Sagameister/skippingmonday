@@ -7,14 +7,32 @@ import { sanityClient, urlFor, isSanityConfigured } from '../lib/sanity';
 // Check if Sanity is connected
 const hasSanity = isSanityConfigured;
 let heroSongs = [];
+let featuredGigsForHero = [];
+let featuredNewsForHero = [];
 let gigs = [];
 let newsArticles = [];
 let photos = [];
 let videos = [];
 
+function formatGigDate(dateStr, lang) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return '';
+  const day = parseInt(parts[2], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthsDe = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+  if (lang === 'de') {
+    return `${day}. ${monthsDe[month]}`;
+  }
+  return `${monthsEn[month]} ${day}`;
+}
+
 if (hasSanity) {
   try {
     heroSongs = await sanityClient.fetch(`*[_type == "song" && isFeatured == true]`);
+    featuredGigsForHero = await sanityClient.fetch(`*[_type == "post" && postType == "gig" && !isPast && isFeatured == true] | order(date asc)`);
+    featuredNewsForHero = await sanityClient.fetch(`*[_type == "post" && postType == "news" && isFeatured == true] | order(date desc)`);
     
     gigs = await sanityClient.fetch(`*[_type == "post" && postType == "gig" && !isPast && isFeatured == true] | order(date asc)[0..4]`);
     if (!gigs || gigs.length === 0) {
@@ -37,12 +55,43 @@ if (!videos) videos = [];
 
 // Prepare cycling song items for client script
 let formattedSongs = [];
+let sliderItems = [];
+
+// 1. Add featured songs from CMS
 if (heroSongs && heroSongs.length > 0) {
-  formattedSongs = heroSongs.map(song => ({
-    label: { en: song.categoryEn, de: song.categoryDe },
-    text: { en: song.titleEn, de: song.titleDe }
+  sliderItems.push(...heroSongs.map(s => ({
+    label: { en: s.categoryEn || 'Announcement', de: s.categoryDe || 'Ankündigung' },
+    text: { en: s.titleEn, de: s.titleDe }
+  })));
+}
+
+// 2. Add featured gigs from CMS
+if (featuredGigsForHero && featuredGigsForHero.length > 0) {
+  sliderItems.push(...featuredGigsForHero.map(g => {
+    const dateEn = formatGigDate(g.date, 'en');
+    const dateDe = formatGigDate(g.date, 'de');
+    const venueName = g.venue || '';
+    const city = g.city || '';
+    return {
+      label: { en: 'Upcoming gig', de: 'Nächstes Konzert' },
+      text: { 
+        en: `${city}${city && venueName ? ' — ' : ''}${venueName}${dateEn ? ` · ${dateEn}` : ''}`,
+        de: `${city}${city && venueName ? ' — ' : ''}${venueName}${dateDe ? ` · ${dateDe}` : ''}`
+      }
+    };
   }));
-} else {
+}
+
+// 3. Add featured news from CMS
+if (featuredNewsForHero && featuredNewsForHero.length > 0) {
+  sliderItems.push(...featuredNewsForHero.map(n => ({
+    label: { en: 'Announcement', de: 'Ankündigung' },
+    text: { en: n.titleEn, de: n.titleDe }
+  })));
+}
+
+// Fallback to static items if no custom items are featured anywhere
+if (sliderItems.length === 0) {
   formattedSongs = [
     { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Berlin — Lido · Sep 12', de:'Berlin — Lido · 12. Sep'} },
     { label: {en:'New release',   de:'Neue Single'}, text: {en:'“Call In Sad” — out now', de:'„Call In Sad“ — jetzt draußen'} },
@@ -50,6 +99,8 @@ if (heroSongs && heroSongs.length > 0) {
     { label: {en:'Upcoming gig',  de:'Nächstes Konzert'}, text: {en:'Hamburg — Molotow · Sep 19', de:'Hamburg — Molotow · 19. Sep'} },
     { label: {en:'Announcement',  de:'Ankündigung'}, text: {en:'Köln is sold out — danke!', de:'Köln ist ausverkauft — danke!'} }
   ];
+} else {
+  formattedSongs = sliderItems;
 }
 
 // Fallback for gigs
