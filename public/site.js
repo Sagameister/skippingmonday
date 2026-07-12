@@ -540,5 +540,43 @@ if (lightbox) {
   }
 }
 
+/* ---------- video hub playlist switcher ---------- */
+document.addEventListener('click', (e) => {
+  const playlistItem = e.target.closest('.playlist-item');
+  if (playlistItem) {
+    const hub = playlistItem.closest('.video-hub');
+    if (hub) {
+      // Deactivate other items
+      hub.querySelectorAll('.playlist-item').forEach(item => item.classList.remove('active'));
+      // Activate clicked item
+      playlistItem.classList.add('active');
+      
+      // Update iframe source (with autoplay)
+      const iframe = hub.querySelector('.main-video-iframe');
+      if (iframe) {
+        let newSrc = playlistItem.getAttribute('data-src');
+        if (newSrc) {
+          const separator = newSrc.includes('?') ? '&' : '?';
+          iframe.src = `${newSrc}${separator}autoplay=1`;
+        }
+      }
+      
+      // Update title
+      const titleEl = hub.querySelector('.main-video-title');
+      if (titleEl) {
+        const enTitle = playlistItem.getAttribute('data-title-en');
+        const deTitle = playlistItem.getAttribute('data-title-de');
+        titleEl.setAttribute('data-en', enTitle);
+        titleEl.setAttribute('data-de', deTitle);
+        
+        // Trigger translation updates
+        const currentLang = document.documentElement.lang || 'en';
+        titleEl.textContent = currentLang === 'de' ? deTitle : enTitle;
+      }
+    }
+  }
+});
+
+
 
 

@@ -936,24 +936,83 @@ body {
        (Planned: the Media nav link becomes its own page later —
        this section is deliberately self-contained for that move.) -->
   <div class="sub-head first">
-    <h3 class="subtitle" data-split data-en="Video" data-de="Video">Video</h3>
+    <h3 class="subtitle" data-split data-en="Videos" data-de="Videos">Videos</h3>
   </div>
-  <div class="video-grid">
-    {videos.map((vid) => {
-      const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : vid.staticImage;
-      return (
-        <figure class="vid">
-          <a href={vid.videoUrl} aria-label={`Play: ${vid.titleEn}`}>
-            <span class="v-thumb">
-              <img src={thumbUrl} alt={vid.titleEn} />
-              <span class="play">▶</span>
-            </span>
-          </a>
-          <figcaption data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</figcaption>
-        </figure>
-      );
-    })}
-  </div>
+  {(() => {
+    const getEmbedSrc = (url) => {
+      const ytReg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const ytMatch = url ? url.match(ytReg) : null;
+      const ytId = (ytMatch && ytMatch[2].length === 11) ? ytMatch[2] : null;
+
+      const vimReg = /vimeo\.com\/(?:video\/)?([0-9]+)/;
+      const vimMatch = url ? url.match(vimReg) : null;
+      const vimId = vimMatch ? vimMatch[1] : null;
+
+      if (ytId) return { type: 'youtube', id: ytId, src: `https://www.youtube.com/embed/${ytId}` };
+      if (vimId) return { type: 'vimeo', id: vimId, src: `https://player.vimeo.com/video/${vimId}` };
+      return null;
+    };
+
+    const parsedVideos = videos.map(vid => ({
+      ...vid,
+      embed: getEmbedSrc(vid.videoUrl)
+    })).filter(vid => vid.embed !== null);
+
+    if (parsedVideos.length === 0) return null;
+    
+    const initialVideo = parsedVideos[0];
+    const initialSrc = initialVideo.embed.src;
+    
+    return (
+      <div class="video-hub">
+        <div class="video-main-player">
+          <div class="v-embed-wrapper">
+            <iframe 
+              class="main-video-iframe" 
+              title={initialVideo.titleEn}
+              src={initialSrc} 
+              allow="autoplay; encrypted-media" 
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="video-main-info">
+            <h4 class="main-video-title" data-en={initialVideo.titleEn} data-de={initialVideo.titleDe}>{initialVideo.titleEn}</h4>
+          </div>
+        </div>
+        
+        <div class="video-playlist">
+          <div class="playlist-header">
+            <span class="playlist-title" data-en="Videos" data-de="Videos">Videos</span>
+            <span class="video-count">{parsedVideos.length} {parsedVideos.length === 1 ? 'Video' : 'Videos'}</span>
+          </div>
+          <div class="playlist-items">
+            {parsedVideos.map((vid, idx) => {
+              const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : (vid.embed.type === 'youtube' ? `https://img.youtube.com/vi/${vid.embed.id}/mqdefault.jpg` : vid.staticImage);
+              return (
+                <button 
+                  class={`playlist-item ${idx === 0 ? 'active' : ''}`}
+                  data-index={idx}
+                  data-src={vid.embed.src}
+                  data-title-en={vid.titleEn}
+                  data-title-de={vid.titleDe}
+                  aria-label={`Play: ${vid.titleEn}`}
+                >
+                  <div class="playlist-thumb">
+                    <img src={thumbUrl} alt={vid.titleEn} />
+                    <span class="play-overlay">▶</span>
+                  </div>
+                  <div class="playlist-meta">
+                    <span class="item-title" data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</span>
+                    <span class="item-playing" data-en="Now Playing" data-de="Wird abgespielt">Now Playing</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  })()}
 
   <!-- ---------- PHOTOS: uniform-height auto-sliding row ---------- -->
   <div class="sub-head">

@@ -30,42 +30,81 @@ if (!photos) photos = [];
     <div class="sub-head first">
       <h3 class="subtitle" data-split data-en="Videos" data-de="Videos">Videos</h3>
     </div>
-    <div class="video-grid">
-      {videos.map((vid) => {
-        const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : vid.staticImage;
+    {(() => {
+      const getEmbedSrc = (url) => {
         const ytReg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const ytMatch = vid.videoUrl ? vid.videoUrl.match(ytReg) : null;
+        const ytMatch = url ? url.match(ytReg) : null;
         const ytId = (ytMatch && ytMatch[2].length === 11) ? ytMatch[2] : null;
 
         const vimReg = /vimeo\.com\/(?:video\/)?([0-9]+)/;
-        const vimMatch = vid.videoUrl ? vid.videoUrl.match(vimReg) : null;
+        const vimMatch = url ? url.match(vimReg) : null;
         const vimId = vimMatch ? vimMatch[1] : null;
 
-        let embedSrc = '';
-        if (ytId) {
-          embedSrc = `https://www.youtube.com/embed/${ytId}`;
-        } else if (vimId) {
-          embedSrc = `https://player.vimeo.com/video/${vimId}`;
-        }
-        return (
-          <figure class="vid reveal-img" data-reveal>
+        if (ytId) return { type: 'youtube', id: ytId, src: `https://www.youtube.com/embed/${ytId}` };
+        if (vimId) return { type: 'vimeo', id: vimId, src: `https://player.vimeo.com/video/${vimId}` };
+        return null;
+      };
+
+      const parsedVideos = videos.map(vid => ({
+        ...vid,
+        embed: getEmbedSrc(vid.videoUrl)
+      })).filter(vid => vid.embed !== null);
+
+      if (parsedVideos.length === 0) return null;
+      
+      const initialVideo = parsedVideos[0];
+      const initialSrc = initialVideo.embed.src;
+      
+      return (
+        <div class="video-hub">
+          <div class="video-main-player">
             <div class="v-embed-wrapper">
-              {embedSrc ? (
-                <iframe
-                  title={vid.titleEn}
-                  src={embedSrc}
-                  loading="lazy"
-                  allowfullscreen
-                ></iframe>
-              ) : (
-                <img src={thumbUrl} alt={vid.titleEn} />
-              )}
+              <iframe 
+                class="main-video-iframe" 
+                title={initialVideo.titleEn}
+                src={initialSrc} 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen
+              ></iframe>
             </div>
-            <figcaption data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</figcaption>
-          </figure>
-        );
-      })}
-    </div>
+            <div class="video-main-info">
+              <h4 class="main-video-title" data-en={initialVideo.titleEn} data-de={initialVideo.titleDe}>{initialVideo.titleEn}</h4>
+            </div>
+          </div>
+          
+          <div class="video-playlist">
+            <div class="playlist-header">
+              <span class="playlist-title" data-en="Videos" data-de="Videos">Videos</span>
+              <span class="video-count">{parsedVideos.length} {parsedVideos.length === 1 ? 'Video' : 'Videos'}</span>
+            </div>
+            <div class="playlist-items">
+              {parsedVideos.map((vid, idx) => {
+                const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : (vid.embed.type === 'youtube' ? `https://img.youtube.com/vi/${vid.embed.id}/mqdefault.jpg` : vid.staticImage);
+                return (
+                  <button 
+                    class={`playlist-item ${idx === 0 ? 'active' : ''}`}
+                    data-index={idx}
+                    data-src={vid.embed.src}
+                    data-title-en={vid.titleEn}
+                    data-title-de={vid.titleDe}
+                    aria-label={`Play: ${vid.titleEn}`}
+                  >
+                    <div class="playlist-thumb">
+                      <img src={thumbUrl} alt={vid.titleEn} />
+                      <span class="play-overlay">▶</span>
+                    </div>
+                    <div class="playlist-meta">
+                      <span class="item-title" data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</span>
+                      <span class="item-playing" data-en="Now Playing" data-de="Wird abgespielt">Now Playing</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    })()}
 
     <div class="sub-head">
       <h3 class="subtitle" data-split data-en="Photos" data-de="Fotos">Photos</h3>
