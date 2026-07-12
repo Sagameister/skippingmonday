@@ -24,6 +24,13 @@ export default defineType({
       description: 'URL of the video to open/play',
       validation: Rule => Rule.required(),
     }),
+    defineField({
+      name: 'order',
+      title: 'Order Position',
+      type: 'number',
+      description: 'Optional sorting number (e.g., 1, 2, 3). Lower numbers show first.',
+      validation: Rule => Rule.min(0),
+    }),
   ],
   preview: {
     select: {
