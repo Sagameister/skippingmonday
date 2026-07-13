@@ -593,7 +593,7 @@ footer{
   transition: transform .3s cubic-bezier(0.22,1,0.36,1);
 }
 .newsletter button:hover{ transform: translateX(6px); }
-.nl-note{ margin-top: 12px; font-size:12px; color: var(--muted); }
+.nl-note{ margin-top: 12px; font-size:14px; color: var(--muted); }
 
 /* giant wordmark — SVG text scales to exactly 100% width */
 .giant-wrap{ overflow:hidden; }
