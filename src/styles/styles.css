@@ -1032,7 +1032,7 @@ html.lenis, html.lenis body {
 }
 
 /* responsive media queries */
-@media (max-width: 1024px) {
+@media (max-width: 850px) {
   .video-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1044,7 +1044,7 @@ html.lenis, html.lenis body {
     max-height: 360px;
   }
 }
-@media (max-width: 760px) {
+@media (max-width: 550px) {
   .video-grid {
     grid-template-columns: 1fr;
   }
