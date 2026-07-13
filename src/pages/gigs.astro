@@ -201,6 +201,12 @@ const pastGigs = gigs.filter(g => g.isPast);
             </figure>
             
             <div class="gig-details-meta">
+              {gig.date && (
+                <div class="meta-item">
+                  <span class="meta-label" data-en="Date" data-de="Datum">Date</span>
+                  <span class="meta-value">{formatDate(gig.date)}</span>
+                </div>
+              )}
               {gig.time && (
                 <div class="meta-item">
                   <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
@@ -287,6 +293,12 @@ const pastGigs = gigs.filter(g => g.isPast);
                 </figure>
                 
                 <div class="gig-details-meta">
+                  {gig.date && (
+                    <div class="meta-item">
+                      <span class="meta-label" data-en="Date" data-de="Datum">Date</span>
+                      <span class="meta-value">{formatDate(gig.date)}</span>
+                    </div>
+                  )}
                   {gig.time && (
                     <div class="meta-item">
                       <span class="meta-label" data-en="Time" data-de="Uhrzeit">Time</span>
