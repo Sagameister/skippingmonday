@@ -661,9 +661,8 @@ svg.giant .giant-rainbow{
   gap: 4px;
 }
 .meta-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: 12px;
+  letter-spacing: 0.02em;
   color: var(--gray);
 }
 .meta-value {
