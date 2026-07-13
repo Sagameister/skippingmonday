@@ -545,7 +545,7 @@ footer{
   gap: 48px;
   margin-bottom: 12vh;
 }
-.foot-grid .micro{ margin-bottom: 16px; display:block; }
+.foot-grid .micro{ font-size: 13px; letter-spacing: .12em; margin-bottom: 16px; display:block; }
 .clock-row{
   display:flex;
   justify-content:space-between;
