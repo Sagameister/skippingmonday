@@ -859,6 +859,9 @@ html.lenis, html.lenis body {
   filter: invert(90%) hue-rotate(180deg) grayscale(45%); /* matches the sleek dark aesthetic! */
   opacity: 0.8;
   transition: opacity 0.3s ease, filter 0.3s ease;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto !important;
 }
 .gig-map:hover {
   opacity: 1;
