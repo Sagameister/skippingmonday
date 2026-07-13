@@ -849,8 +849,8 @@ html.lenis, html.lenis body {
   border-radius: 8px;
   border: 1px solid var(--line);
   background: var(--nav-contrast);
-  aspect-ratio: 16 / 9;
-  max-height: 350px;
+  aspect-ratio: 4 / 3;
+  max-height: 480px;
 }
 .gig-map {
   width: 100%;
