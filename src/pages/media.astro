@@ -51,23 +51,58 @@ if (!photos) photos = [];
       })).filter(vid => vid.embed !== null);
 
       if (parsedVideos.length === 0) return null;
+
+      const initialVideo = parsedVideos[0];
+      const initialSrc = initialVideo.embed.src;
       
       return (
-        <div class="video-grid">
-          {parsedVideos.map((vid) => (
-            <div class="vid">
-              <div class="v-embed-wrapper" style="position: relative; display: block; aspect-ratio: 16/9; overflow: hidden; background: #000;">
-                <iframe 
-                  style="border: 0; outline: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"
-                  title={vid.titleEn}
-                  src={vid.embed.src} 
-                  allow="autoplay; encrypted-media" 
-                  allowfullscreen
-                ></iframe>
-              </div>
-              <figcaption data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</figcaption>
+        <div class="video-hub">
+          <div class="video-main-player">
+            <div class="v-embed-wrapper" style="position: relative; display: block; aspect-ratio: 16/9; overflow: hidden; background: #000;">
+              <iframe 
+                class="main-video-iframe" 
+                style="border: 0; outline: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;"
+                title={initialVideo.titleEn}
+                src={initialSrc} 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen
+              ></iframe>
             </div>
-          ))}
+            <div class="video-main-info">
+              <h4 class="main-video-title" data-en={initialVideo.titleEn} data-de={initialVideo.titleDe}>{initialVideo.titleEn}</h4>
+            </div>
+          </div>
+          
+          <div class="video-playlist">
+            <div class="playlist-header">
+              <span class="playlist-title" data-en="Videos" data-de="Videos">Videos</span>
+              <span class="video-count">{parsedVideos.length} {parsedVideos.length === 1 ? 'Video' : 'Videos'}</span>
+            </div>
+            <div class="playlist-items">
+              {parsedVideos.map((vid, idx) => {
+                const thumbUrl = vid.thumbnail ? urlFor(vid.thumbnail).url() : (vid.embed.type === 'youtube' ? `https://img.youtube.com/vi/${vid.embed.id}/mqdefault.jpg` : vid.staticImage);
+                return (
+                  <button 
+                    class={`playlist-item ${idx === 0 ? 'active' : ''}`}
+                    data-index={idx}
+                    data-src={vid.embed.src}
+                    data-title-en={vid.titleEn}
+                    data-title-de={vid.titleDe}
+                    aria-label={`Play: ${vid.titleEn}`}
+                  >
+                    <div class="playlist-thumb">
+                      <img src={thumbUrl} alt={vid.titleEn} />
+                      <span class="play-overlay">▶</span>
+                    </div>
+                    <div class="playlist-meta">
+                      <span class="item-title" data-en={vid.titleEn} data-de={vid.titleDe}>{vid.titleEn}</span>
+                      <span class="item-playing" data-en="Now Playing" data-de="Wird abgespielt">Now Playing</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       );
     })()}
