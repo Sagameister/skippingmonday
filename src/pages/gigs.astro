@@ -191,8 +191,8 @@ const pastGigs = gigs.filter(g => g.isPast);
         <article class="post" id={id}>
           <div class="post-head">
             <div class="post-date">{formatDate(gig.date)}</div>
-            <h2 class="post-title" data-split data-en={`${gig.city} — ${gig.venue}`} data-de={`${gig.city} — ${gig.venue}`}>
-              {gig.city} — {gig.venue}
+            <h2 class="post-title" data-split data-en={gig.titleEn || `${gig.city} — ${gig.venue}`} data-de={gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`}>
+              {gig.titleEn || `${gig.city} — ${gig.venue}`}
             </h2>
           </div>
           <div class="post-body">
@@ -283,8 +283,8 @@ const pastGigs = gigs.filter(g => g.isPast);
             <article class="post past" id={id}>
               <div class="post-head">
                 <div class="post-date">{formatDate(gig.date)}</div>
-                <h2 class="post-title" data-split data-en={`${gig.city} — ${gig.venue}`} data-de={`${gig.city} — ${gig.venue}`}>
-                  {gig.city} — {gig.venue}
+                <h2 class="post-title" data-split data-en={gig.titleEn || `${gig.city} — ${gig.venue}`} data-de={gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`}>
+                  {gig.titleEn || `${gig.city} — ${gig.venue}`}
                 </h2>
               </div>
               <div class="post-body">

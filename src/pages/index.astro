@@ -1034,7 +1034,9 @@ body {
       return (
         <a class="gig" href={`/gigs#${gig._id}`} data-thumb={thumbUrl}>
           <span class="g-date">{formatDate(gig.date)}</span>
-          <div class="g-title">{gig.city} — {gig.venue}</div>
+          <div class="g-title" data-en={gig.titleEn || `${gig.city} — ${gig.venue}`} data-de={gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`}>
+            {gig.titleEn || `${gig.city} — ${gig.venue}`}
+          </div>
           {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
         </a>
       );
