@@ -964,7 +964,7 @@ body {
   line-height: 1;
   z-index: 99;
   transform: translate(-50%, -50%);
-  text-shadow: 0 0 12px currentColor, 0 2px 8px rgba(0,0,0,0.25);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
 }
 </style>
 <body>
@@ -1216,7 +1216,7 @@ body {
         note.style.color = gsap.utils.random(colors);
         note.style.left = `${clickX}px`;
         note.style.top = `${clickY}px`;
-        note.style.fontSize = `${gsap.utils.random(20, 48, 1)}px`;
+        note.style.fontSize = `${gsap.utils.random(28, 64, 1)}px`;
         note.style.transform = `translate(-50%, -50%) rotate(${gsap.utils.random(-45, 45)}deg)`;
         
         statementSection.appendChild(note);
@@ -1231,7 +1231,7 @@ body {
           y: yOffset - gsap.utils.random(50, 150),
           rotation: gsap.utils.random(-360, 360),
           opacity: 0,
-          scale: gsap.utils.random(0.2, 0.5),
+          scale: gsap.utils.random(0.4, 0.7),
           duration: gsap.utils.random(1.4, 2.2),
           ease: 'power2.out',
           onComplete: () => {
@@ -1682,15 +1682,15 @@ if (prefersReduced) {
       const radius = 4.5; // attraction radius
 
       if (dist < radius) {
-        // Pull force increases as cursor gets closer, up to a limit
-        const force = (radius - dist) / radius * 1.2;
-        pullX = (dx / (dist || 0.001)) * force;
-        pullY = (dy / (dist || 0.001)) * force;
+        // Pull force scale factor (smoothly drops to zero as dist gets close to 0 to prevent jitter)
+        const factor = (radius - dist) / radius * 0.25;
+        pullX = dx * factor;
+        pullY = dy * factor;
       }
 
-      // Smoothly ease position toward target + pull force (snappier easing)
-      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.12;
-      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.12;
+      // Smoothly ease position toward target + pull force
+      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.08;
+      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.08;
     });
 
     // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
