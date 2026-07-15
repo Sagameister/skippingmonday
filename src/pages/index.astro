@@ -689,7 +689,13 @@ header nav a.nav-link:hover::after{ width:100%; }
   z-index:2;
   color:#fff;
 }
-.hero .cycle .micro{ color: rgba(255,255,255,.7); margin-bottom: 8px; }
+.hero .cycle .micro{
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  margin-bottom: 12px;
+}
 .hero .cycle .title{
   font-family:'Inter Tight', sans-serif;
   font-weight:500;
@@ -1787,8 +1793,8 @@ splitEls.forEach((el) => {
 // photo starts slightly larger and settles at 1.12 — it stays
 // oversized on purpose, so the parallax below never shows gaps
 gsap.fromTo('.hero img', { scale: 1.18 }, { scale: 1.12, duration: 1.4, ease: 'brand' });
-// "Now playing" label: opacity-only, settles at 70% (Pattern 7)
-gsap.fromTo('.hero .cycle .micro', { opacity: 0 }, { opacity: .7, duration: .8, ease: 'brand', delay: .3 });
+// "Now playing" label: settles at solid opacity (Pattern 7)
+gsap.fromTo('.hero .cycle .micro', { opacity: 0 }, { opacity: 1, duration: .8, ease: 'brand', delay: .3 });
 gsap.delayedCall(.4, () => renderHeroItem(true));  // first hero item mask-reveals in
 
 // --- Pattern 5: hero parallax — photo drifts while being covered.
