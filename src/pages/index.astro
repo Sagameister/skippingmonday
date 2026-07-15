@@ -1720,21 +1720,19 @@ if (prefersReduced) {
       const targetX = data.homeX + driftX;
       const targetY = data.homeY + driftY;
 
-      // Slow magnetic attraction pull when cursor is inside the statement section
-      let pullX = 0;
-      let pullY = 0;
+      // Easing destination based on mouse state (gravitate directly to cursor if inside)
+      let destinationX = targetX;
+      let destinationY = targetY;
 
       if (mouseInsideSection) {
-        const dx = mouse3D.x - sprite.position.x;
-        const dy = mouse3D.y - sprite.position.y;
-        // Slow pull toward mouse (gentle coefficient)
-        pullX = dx * 0.12;
-        pullY = dy * 0.12;
+        // Gravitate to cursor, but retain 25% of their home spread to prevent total overlapping blobs
+        destinationX = mouse3D.x + data.homeX * 0.25;
+        destinationY = mouse3D.y + data.homeY * 0.25;
       }
 
-      // Smoothly ease position toward target + magnetic pull (slow, liquid motion)
-      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.04;
-      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.04;
+      // Smoothly ease position toward the destination (slow, magnetic glide)
+      sprite.position.x += (destinationX - sprite.position.x) * 0.035;
+      sprite.position.y += (destinationY - sprite.position.y) * 0.035;
     });
 
     // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
