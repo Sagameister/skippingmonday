@@ -156,6 +156,11 @@ function formatDate(dateStr: string) {
   return dateStr;
 }
 
+function capitalizeTitle(str: string) {
+  if (!str) return "";
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
 const upcomingGigs = gigs.filter(g => !g.isPast);
 const pastGigs = gigs.filter(g => g.isPast);
 ---
@@ -189,8 +194,8 @@ const pastGigs = gigs.filter(g => g.isPast);
 
       const rawTitleEn = gig.titleEn || `${gig.city} — ${gig.venue}`;
       const rawTitleDe = gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`;
-      const titleEn = rawTitleEn.toLowerCase();
-      const titleDe = rawTitleDe.toLowerCase();
+      const titleEn = capitalizeTitle(rawTitleEn);
+      const titleDe = capitalizeTitle(rawTitleDe);
 
       return (
         <article class="post" id={id}>
@@ -286,8 +291,8 @@ const pastGigs = gigs.filter(g => g.isPast);
 
           const rawTitleEn = gig.titleEn || `${gig.city} — ${gig.venue}`;
           const rawTitleDe = gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`;
-          const titleEn = rawTitleEn.toLowerCase();
-          const titleDe = rawTitleDe.toLowerCase();
+          const titleEn = capitalizeTitle(rawTitleEn);
+          const titleDe = capitalizeTitle(rawTitleDe);
 
           return (
             <article class="post past" id={id}>

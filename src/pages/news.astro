@@ -73,6 +73,11 @@ function formatDate(dateStr: string) {
   }
   return dateStr;
 }
+
+function capitalizeTitle(str: string) {
+  if (!str) return "";
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
 ---
 <BaseLayout title="News — Skipping Mondays">
   <!-- ===================== PAGE HERO ===================== -->
@@ -100,8 +105,8 @@ function formatDate(dateStr: string) {
 
       const rawTitleEn = article.titleEn || 'Untitled';
       const rawTitleDe = article.titleDe || article.titleEn || 'Unbenannt';
-      const titleEn = rawTitleEn.toLowerCase();
-      const titleDe = rawTitleDe.toLowerCase();
+      const titleEn = capitalizeTitle(rawTitleEn);
+      const titleDe = capitalizeTitle(rawTitleDe);
 
       return (
         <article class="post" id={id}>

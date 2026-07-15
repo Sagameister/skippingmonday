@@ -44,6 +44,11 @@ function formatGigDate(dateStr, lang) {
   return `${monthsEn[month]} ${day}`;
 }
 
+function capitalizeTitle(str) {
+  if (!str) return "";
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
 if (hasSanity) {
   try {
     heroSongs = await sanityClient.fetch(`*[_type == "song" && isFeatured == true]`);
@@ -1033,8 +1038,8 @@ body {
       const thumbUrl = gig.coverImage ? urlFor(gig.coverImage).url() : 'https://picsum.photos/seed/gighover/480/360';
       const rawTitleEn = gig.titleEn || `${gig.city} — ${gig.venue}`;
       const rawTitleDe = gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`;
-      const titleEn = rawTitleEn.toLowerCase();
-      const titleDe = rawTitleDe.toLowerCase();
+      const titleEn = capitalizeTitle(rawTitleEn);
+      const titleDe = capitalizeTitle(rawTitleDe);
       return (
         <a class="gig" href={`/gigs#${gig._id}`} data-thumb={thumbUrl}>
           <span class="g-date">{formatDate(gig.date)}</span>
