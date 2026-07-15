@@ -1665,22 +1665,10 @@ for (let i = 0; i < COUNT; i++) {
 
 // Gentle drift + interactive cursor magnetic physics
 let mx = 0, my = 0;
-let mouseInsideSection = false;
-
-const statementEl = document.querySelector('.statement');
-if (statementEl) {
-  statementEl.addEventListener('mouseenter', () => {
-    mouseInsideSection = true;
-  });
-  statementEl.addEventListener('mouseleave', () => {
-    mouseInsideSection = false;
-  });
-  statementEl.addEventListener('mousemove', (e) => {
-    const rect = statementEl.getBoundingClientRect();
-    mx = (e.clientX - rect.left) / rect.width - 0.5;
-    my = (e.clientY - rect.top) / rect.height - 0.5;
-  });
-}
+addEventListener('mousemove', (e) => {
+  mx = e.clientX / innerWidth  - 0.5;
+  my = e.clientY / innerHeight - 0.5;
+});
 
 const clock = new THREE.Clock();
 if (prefersReduced) {
@@ -1705,19 +1693,25 @@ if (prefersReduced) {
       const targetX = data.homeX + driftX;
       const targetY = data.homeY + driftY;
 
-      // Easing destination based on mouse state (gravitate directly to cursor if inside)
-      let destinationX = targetX;
-      let destinationY = targetY;
+      // Cursor magnetic attraction physics (nodes drift toward cursor if mouse gets close)
+      const dx = mouse3D.x - sprite.position.x;
+      const dy = mouse3D.y - sprite.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (mouseInsideSection) {
-        // Gravitate to cursor, but retain 25% of their home spread to prevent total overlapping blobs
-        destinationX = mouse3D.x + data.homeX * 0.25;
-        destinationY = mouse3D.y + data.homeY * 0.25;
+      let pullX = 0;
+      let pullY = 0;
+      const radius = 4.5; // attraction radius
+
+      if (dist < radius) {
+        // Pull force scale factor (smoothly drops to zero as dist gets close to 0 to prevent jitter)
+        const factor = (radius - dist) / radius * 0.25;
+        pullX = dx * factor;
+        pullY = dy * factor;
       }
 
-      // Smoothly ease position toward the destination (slow, magnetic glide)
-      sprite.position.x += (destinationX - sprite.position.x) * 0.035;
-      sprite.position.y += (destinationY - sprite.position.y) * 0.035;
+      // Smoothly ease position toward target + pull force
+      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.08;
+      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.08;
     });
 
     // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
