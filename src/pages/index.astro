@@ -94,13 +94,15 @@ if (featuredGigsForHero && featuredGigsForHero.length > 0) {
   sliderItems.push(...featuredGigsForHero.map(g => {
     const dateEn = formatGigDate(g.date, 'en');
     const dateDe = formatGigDate(g.date, 'de');
-    const venueName = g.venue || '';
-    const city = g.city || '';
+    const rawTitleEn = g.titleEn || `${g.city} — ${g.venue}`;
+    const rawTitleDe = g.titleDe || g.titleEn || `${g.city} — ${g.venue}`;
+    const titleEn = capitalizeTitle(rawTitleEn);
+    const titleDe = capitalizeTitle(rawTitleDe);
     return {
       label: { en: 'Upcoming gig', de: 'Nächstes Konzert' },
       text: { 
-        en: `${city}${city && venueName ? ' — ' : ''}${venueName}${dateEn ? ` · ${dateEn}` : ''}`,
-        de: `${city}${city && venueName ? ' — ' : ''}${venueName}${dateDe ? ` · ${dateDe}` : ''}`
+        en: `${titleEn}${dateEn ? ` · ${dateEn}` : ''}`,
+        de: `${titleDe}${dateDe ? ` · ${dateDe}` : ''}`
       },
       image: g.coverImage ? urlFor(g.coverImage).url() : '/Images/hero.jpg'
     };
