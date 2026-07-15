@@ -727,12 +727,12 @@ header nav a.nav-link:hover::after{ width:100%; }
 .statement h1 .line{ display:block; }  /* no overflow:hidden — word masks handle clipping */
 .statement h1 .line span{ display:inline-block; }
 .statement .sub{
-  font-size: 12px;
-  letter-spacing:.16em;
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--black);
-  max-width: 520px;
-  line-height: 1.9;
+  max-width: 680px;
+  line-height: 1.6;
 }
 
 /* ============================================================
