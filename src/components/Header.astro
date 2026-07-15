@@ -1,14 +1,17 @@
+---
+const pathname = Astro.url.pathname;
+---
 <!-- ===================== HEADER ===================== -->
 <header>
   <a class="wordmark" href="/">
     <img src="/Images/logo-horiz-wht.svg" alt="Skipping Mondays">
   </a>
   <nav>
-    <a class="nav-link" href="/gigs"    data-en="Gigs"    data-de="Konzerte">Gigs</a>
-    <a class="nav-link" href="/media"   data-en="Media"   data-de="Medien">Media</a>
-    <a class="nav-link" href="/news"    data-en="News"    data-de="Aktuelles">News</a>
-    <a class="nav-link" href="/about"   data-en="About"   data-de="Über uns">About</a>
-    <a class="nav-link" href="/contact" data-en="Contact" data-de="Kontakt">Contact</a>
+    <a class={pathname.startsWith('/gigs') ? "nav-link active" : "nav-link"} href="/gigs"    data-en="Gigs"    data-de="Konzerte">Gigs</a>
+    <a class={pathname.startsWith('/media') ? "nav-link active" : "nav-link"} href="/media"   data-en="Media"   data-de="Medien">Media</a>
+    <a class={pathname.startsWith('/news') ? "nav-link active" : "nav-link"} href="/news"    data-en="News"    data-de="Aktuelles">News</a>
+    <a class={pathname.startsWith('/about') ? "nav-link active" : "nav-link"} href="/about"   data-en="About"   data-de="Über uns">About</a>
+    <a class={pathname.startsWith('/contact') ? "nav-link active" : "nav-link"} href="/contact" data-en="Contact" data-de="Kontakt">Contact</a>
     <div class="lang">
       <button id="lang-current" aria-haspopup="true" aria-expanded="false">EN</button>
       <div class="lang-menu"><button id="lang-opt" data-lang="de">DE</button></div>
