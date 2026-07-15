@@ -964,7 +964,7 @@ body {
   line-height: 1;
   z-index: 99;
   transform: translate(-50%, -50%);
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+  text-shadow: 0 0 12px currentColor, 0 2px 8px rgba(0,0,0,0.25);
 }
 </style>
 <body>
@@ -1208,7 +1208,7 @@ body {
       const clickX = e.clientX - rect.left;
       const clickY = e.clientY - rect.top;
 
-      const numNotes = gsap.utils.random(8, 12, 1);
+      const numNotes = gsap.utils.random(16, 24, 1);
       for (let i = 0; i < numNotes; i++) {
         const note = document.createElement('div');
         note.className = 'note-particle';
@@ -1216,23 +1216,23 @@ body {
         note.style.color = gsap.utils.random(colors);
         note.style.left = `${clickX}px`;
         note.style.top = `${clickY}px`;
-        note.style.fontSize = `${gsap.utils.random(18, 36, 1)}px`;
+        note.style.fontSize = `${gsap.utils.random(20, 48, 1)}px`;
         note.style.transform = `translate(-50%, -50%) rotate(${gsap.utils.random(-45, 45)}deg)`;
         
         statementSection.appendChild(note);
 
         const angle = gsap.utils.random(0, Math.PI * 2);
-        const velocity = gsap.utils.random(80, 200);
+        const velocity = gsap.utils.random(120, 350);
         const xOffset = Math.cos(angle) * velocity;
         const yOffset = Math.sin(angle) * velocity;
         
         gsap.to(note, {
           x: xOffset,
-          y: yOffset - gsap.utils.random(40, 100),
+          y: yOffset - gsap.utils.random(50, 150),
           rotation: gsap.utils.random(-360, 360),
           opacity: 0,
-          scale: gsap.utils.random(0.3, 0.7),
-          duration: gsap.utils.random(1.2, 1.8),
+          scale: gsap.utils.random(0.2, 0.5),
+          duration: gsap.utils.random(1.4, 2.2),
           ease: 'power2.out',
           onComplete: () => {
             note.remove();
@@ -1672,25 +1672,25 @@ if (prefersReduced) {
       const targetX = data.homeX + driftX;
       const targetY = data.homeY + driftY;
 
-      // Cursor magnetic push physics (nodes drift away if mouse gets close)
-      const dx = sprite.position.x - mouse3D.x;
-      const dy = sprite.position.y - mouse3D.y;
+      // Cursor magnetic attraction physics (nodes drift toward cursor if mouse gets close)
+      const dx = mouse3D.x - sprite.position.x;
+      const dy = mouse3D.y - sprite.position.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      let pushX = 0;
-      let pushY = 0;
-      const radius = 3.5; // push radius
+      let pullX = 0;
+      let pullY = 0;
+      const radius = 4.5; // attraction radius
 
       if (dist < radius) {
-        // Push force increases as cursor gets closer, up to a limit
-        const force = (radius - dist) / radius * 0.8;
-        pushX = (dx / (dist || 0.001)) * force;
-        pushY = (dy / (dist || 0.001)) * force;
+        // Pull force increases as cursor gets closer, up to a limit
+        const force = (radius - dist) / radius * 1.2;
+        pullX = (dx / (dist || 0.001)) * force;
+        pullY = (dy / (dist || 0.001)) * force;
       }
 
-      // Smoothly ease position toward target + push force (snappier easing)
-      sprite.position.x += (targetX + pushX - sprite.position.x) * 0.12;
-      sprite.position.y += (targetY + pushY - sprite.position.y) * 0.12;
+      // Smoothly ease position toward target + pull force (snappier easing)
+      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.12;
+      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.12;
     });
 
     // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
