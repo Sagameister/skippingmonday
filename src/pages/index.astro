@@ -1678,12 +1678,24 @@ for (let i = 0; i < COUNT; i++) {
   sprites.push(sprite);
 }
 
-// Gentle drift + interactive cursor push-away physics
+// Gentle drift + interactive cursor magnetic physics
 let mx = 0, my = 0;
-addEventListener('mousemove', (e) => {
-  mx = e.clientX / innerWidth  - 0.5;
-  my = e.clientY / innerHeight - 0.5;
-});
+let mouseInsideSection = false;
+
+const statementEl = document.querySelector('.statement');
+if (statementEl) {
+  statementEl.addEventListener('mouseenter', () => {
+    mouseInsideSection = true;
+  });
+  statementEl.addEventListener('mouseleave', () => {
+    mouseInsideSection = false;
+  });
+  statementEl.addEventListener('mousemove', (e) => {
+    const rect = statementEl.getBoundingClientRect();
+    mx = (e.clientX - rect.left) / rect.width - 0.5;
+    my = (e.clientY - rect.top) / rect.height - 0.5;
+  });
+}
 
 const clock = new THREE.Clock();
 if (prefersReduced) {
@@ -1708,25 +1720,21 @@ if (prefersReduced) {
       const targetX = data.homeX + driftX;
       const targetY = data.homeY + driftY;
 
-      // Cursor magnetic attraction physics (nodes drift toward cursor if mouse gets close)
-      const dx = mouse3D.x - sprite.position.x;
-      const dy = mouse3D.y - sprite.position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
+      // Slow magnetic attraction pull when cursor is inside the statement section
       let pullX = 0;
       let pullY = 0;
-      const radius = 4.5; // attraction radius
 
-      if (dist < radius) {
-        // Pull force scale factor (smoothly drops to zero as dist gets close to 0 to prevent jitter)
-        const factor = (radius - dist) / radius * 0.25;
-        pullX = dx * factor;
-        pullY = dy * factor;
+      if (mouseInsideSection) {
+        const dx = mouse3D.x - sprite.position.x;
+        const dy = mouse3D.y - sprite.position.y;
+        // Slow pull toward mouse (gentle coefficient)
+        pullX = dx * 0.12;
+        pullY = dy * 0.12;
       }
 
-      // Smoothly ease position toward target + pull force
-      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.08;
-      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.08;
+      // Smoothly ease position toward target + magnetic pull (slow, liquid motion)
+      sprite.position.x += (targetX + pullX - sprite.position.x) * 0.04;
+      sprite.position.y += (targetY + pullY - sprite.position.y) * 0.04;
     });
 
     // Subtly tilt/rotate the scene based on mouse for 3D parallax depth
