@@ -1590,36 +1590,26 @@ function sizeDust(){
 sizeDust();
 addEventListener('resize', sizeDust);
 
-// Helper to create a texture of a musical note symbol drawn on a canvas
-function createNoteTexture(char, blur) {
+// Helper to create a texture of a musical note symbol drawn on a canvas (always crisp white)
+function createNoteTexture(char) {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
   canvas.height = 128;
   const ctx = canvas.getContext('2d');
 
-  // Draw note in the center
+  // Draw crisp note in the center
   ctx.font = '64px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#999999';
-
-  // Apply shadow blur to simulate depth of field (blurry far away, sharp up close)
-  if (blur > 0) {
-    ctx.shadowColor = 'rgba(153, 153, 153, 0.7)';
-    ctx.shadowBlur = blur;
-  }
-
+  ctx.fillStyle = '#ffffff'; // white base so we can color dynamically in Three.js
   ctx.fillText(char, 64, 64);
+  
   return new THREE.CanvasTexture(canvas);
 }
 
-// Generate textures for different depths (blurry, medium, crisp)
+// Generate crisp textures
 const noteChars = ['♩', '♪', '♫', '♬'];
-const textures = {
-  crisp: noteChars.map(char => createNoteTexture(char, 0)),
-  medium: noteChars.map(char => createNoteTexture(char, 4)),
-  blurry: noteChars.map(char => createNoteTexture(char, 12))
-};
+const crispTextures = noteChars.map(char => createNoteTexture(char));
 
 // Create a group of sprites
 const sprites = [];
@@ -1629,35 +1619,30 @@ for (let i = 0; i < COUNT; i++) {
   // Set random position in a 3D bounding area
   const x = (Math.random() - 0.5) * 24;
   const y = (Math.random() - 0.5) * 12;
-  const z = (Math.random() - 0.5) * 8; // z depth field
+  const z = (Math.random() - 0.5) * 8; // z depth field from -4 to 4
 
-  let textureList;
-  let opacity;
-  let scale;
+  // depthPercent ranges from 0 (far back) to 1 (foreground)
+  const depthPercent = (z + 4) / 8;
 
-  // Distribute textures, opacities, and sizes based on Z-depth (made a little larger and brighter)
-  if (z < -1.5) {
-    textureList = textures.blurry;
-    opacity = 0.15 + (Math.random() * 0.15); // far back: blurry, subtle glow
-    scale = 0.45 + (Math.random() * 0.2);    // slightly larger blurred notes
-  } else if (z > 1.5) {
-    textureList = textures.crisp;
-    opacity = 0.5 + (Math.random() * 0.15);  // up close: sharp, bright
-    scale = 0.2 + (Math.random() * 0.1);     // middle size sharp notes
-  } else {
-    textureList = textures.medium;
-    opacity = 0.35 + (Math.random() * 0.15); // midground: balanced
-    scale = 0.3 + (Math.random() * 0.15);
-  }
+  // Sizes: smaller far back (0.15), larger up close (0.6)
+  const scale = 0.15 + depthPercent * 0.45 + Math.random() * 0.1;
 
-  // Pick a random musical note character
-  const randomTexture = textureList[Math.floor(Math.random() * textureList.length)];
+  // Colors: lighter/softer in background, darker/near black in foreground
+  // HSL lightness ranges from 0.85 (light gray) to 0.22 (dark gray)
+  const lightness = 0.85 - depthPercent * 0.63;
+  const materialColor = new THREE.Color().setHSL(0, 0, lightness);
+
+  // Opacity: slightly lower in background, more solid in foreground
+  const opacity = 0.2 + depthPercent * 0.6;
+
+  // Pick a random musical note character texture
+  const randomTexture = crispTextures[Math.floor(Math.random() * crispTextures.length)];
 
   const material = new THREE.SpriteMaterial({
     map: randomTexture,
     transparent: true,
     opacity: opacity,
-    color: 0x8a8a8a
+    color: materialColor
   });
 
   const sprite = new THREE.Sprite(material);
