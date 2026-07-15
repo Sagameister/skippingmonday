@@ -275,7 +275,10 @@ header nav a.nav-link.active::after{ width:100%; }
   font-size: clamp(1.6rem, 3.2vw, 2.8rem);
   letter-spacing:-0.02em;
   line-height:1.05;
-  text-transform: none;
+  text-transform: lowercase;
+}
+.g-title::first-letter {
+  text-transform: uppercase;
 }
 .g-note{
   font-size:12px;
@@ -318,7 +321,10 @@ header nav a.nav-link.active::after{ width:100%; }
   line-height:1.02;
   letter-spacing:-0.02em;
   margin-top: 14px;
-  text-transform: none;
+  text-transform: lowercase;
+}
+.post-title::first-letter {
+  text-transform: uppercase;
 }
 .post-hero{
   margin-bottom: 40px;
