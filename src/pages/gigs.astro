@@ -187,12 +187,17 @@ const pastGigs = gigs.filter(g => g.isPast);
       const paragraphsEn = gig.bodyEn ? gig.bodyEn.split('\n\n') : ['No details available yet.'];
       const paragraphsDe = gig.bodyDe ? gig.bodyDe.split('\n\n') : [paragraphsEn[0]];
 
+      const rawTitleEn = gig.titleEn || `${gig.city} — ${gig.venue}`;
+      const rawTitleDe = gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`;
+      const titleEn = rawTitleEn.toLowerCase();
+      const titleDe = rawTitleDe.toLowerCase();
+
       return (
         <article class="post" id={id}>
           <div class="post-head">
             <div class="post-date">{formatDate(gig.date)}</div>
-            <h2 class="post-title" data-split data-en={gig.titleEn || `${gig.city} — ${gig.venue}`} data-de={gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`}>
-              {gig.titleEn || `${gig.city} — ${gig.venue}`}
+            <h2 class="post-title" data-split data-en={titleEn} data-de={titleDe}>
+              {titleEn}
             </h2>
           </div>
           <div class="post-body">
@@ -279,12 +284,17 @@ const pastGigs = gigs.filter(g => g.isPast);
           const paragraphsEn = gig.bodyEn ? gig.bodyEn.split('\n\n') : ['Show completed.'];
           const paragraphsDe = gig.bodyDe ? gig.bodyDe.split('\n\n') : [paragraphsEn[0]];
 
+          const rawTitleEn = gig.titleEn || `${gig.city} — ${gig.venue}`;
+          const rawTitleDe = gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`;
+          const titleEn = rawTitleEn.toLowerCase();
+          const titleDe = rawTitleDe.toLowerCase();
+
           return (
             <article class="post past" id={id}>
               <div class="post-head">
                 <div class="post-date">{formatDate(gig.date)}</div>
-                <h2 class="post-title" data-split data-en={gig.titleEn || `${gig.city} — ${gig.venue}`} data-de={gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`}>
-                  {gig.titleEn || `${gig.city} — ${gig.venue}`}
+                <h2 class="post-title" data-split data-en={titleEn} data-de={titleDe}>
+                  {titleEn}
                 </h2>
               </div>
               <div class="post-body">

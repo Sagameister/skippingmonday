@@ -98,11 +98,16 @@ function formatDate(dateStr: string) {
       const paragraphsEn = article.bodyEn.split('\n\n');
       const paragraphsDe = article.bodyDe.split('\n\n');
 
+      const rawTitleEn = article.titleEn || 'Untitled';
+      const rawTitleDe = article.titleDe || article.titleEn || 'Unbenannt';
+      const titleEn = rawTitleEn.toLowerCase();
+      const titleDe = rawTitleDe.toLowerCase();
+
       return (
         <article class="post" id={id}>
           <div class="post-head">
             <div class="post-date">{formatDate(article.date)}</div>
-            <h2 class="post-title" data-split data-en={article.titleEn} data-de={article.titleDe}>{article.titleEn}</h2>
+            <h2 class="post-title" data-split data-en={titleEn} data-de={titleDe}>{titleEn}</h2>
           </div>
           <div class="post-body">
             <figure class="post-hero reveal-img">

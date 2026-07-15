@@ -1031,11 +1031,15 @@ body {
   <div class="gigs-list">
     {gigs.map((gig) => {
       const thumbUrl = gig.coverImage ? urlFor(gig.coverImage).url() : 'https://picsum.photos/seed/gighover/480/360';
+      const rawTitleEn = gig.titleEn || `${gig.city} — ${gig.venue}`;
+      const rawTitleDe = gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`;
+      const titleEn = rawTitleEn.toLowerCase();
+      const titleDe = rawTitleDe.toLowerCase();
       return (
         <a class="gig" href={`/gigs#${gig._id}`} data-thumb={thumbUrl}>
           <span class="g-date">{formatDate(gig.date)}</span>
-          <div class="g-title" data-en={gig.titleEn || `${gig.city} — ${gig.venue}`} data-de={gig.titleDe || gig.titleEn || `${gig.city} — ${gig.venue}`}>
-            {gig.titleEn || `${gig.city} — ${gig.venue}`}
+          <div class="g-title" data-en={titleEn} data-de={titleDe}>
+            {titleEn}
           </div>
           {gig.soldOut && <span class="g-note" data-en="Sold out" data-de="Ausverkauft">Sold out</span>}
         </a>
