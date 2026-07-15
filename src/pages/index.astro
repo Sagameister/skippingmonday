@@ -706,6 +706,7 @@ header nav a.nav-link:hover::after{ width:100%; }
 .statement{
   position:relative;
   padding: 22vh 3vw 14vh;
+  overflow: hidden;
 }
 #dust-canvas{                  /* subtle three.js particles live back here */
   position:absolute; inset:0;
@@ -956,6 +957,15 @@ body {
   opacity: 1;
   transition: opacity 0.75s ease-out; /* slower fade-in */
 }
+.note-particle {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  z-index: 99;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
 </style>
 <body>
 <Header />
@@ -1174,6 +1184,65 @@ body {
 </div><!-- /page-content -->
 
 <script is:inline define:vars={{ formattedSongs }}>
+/* ---------- statement section colorful musical notes explosion ---------- */
+(function() {
+  const statementSection = document.querySelector('.statement');
+  if (statementSection) {
+    const noteSymbols = ['♩', '♪', '♫', '♬', '♭', '♮', '♯', '𝄞', '𝄢', '𝄡'];
+    const colors = [
+      '#ff2a6d', // neon pink
+      '#05d9e8', // neon cyan
+      '#f58220', // brand orange
+      '#9fbf3b', // brand green
+      '#a78be8', // lavender
+      '#e63b2e', // bright red
+      '#2e8c7a', // teal
+      '#ffc000'  // yellow
+    ];
+
+    statementSection.addEventListener('click', (e) => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (e.target.closest('a') || e.target.closest('button')) return;
+
+      const rect = statementSection.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const numNotes = gsap.utils.random(8, 12, 1);
+      for (let i = 0; i < numNotes; i++) {
+        const note = document.createElement('div');
+        note.className = 'note-particle';
+        note.textContent = gsap.utils.random(noteSymbols);
+        note.style.color = gsap.utils.random(colors);
+        note.style.left = `${clickX}px`;
+        note.style.top = `${clickY}px`;
+        note.style.fontSize = `${gsap.utils.random(18, 36, 1)}px`;
+        note.style.transform = `translate(-50%, -50%) rotate(${gsap.utils.random(-45, 45)}deg)`;
+        
+        statementSection.appendChild(note);
+
+        const angle = gsap.utils.random(0, Math.PI * 2);
+        const velocity = gsap.utils.random(80, 200);
+        const xOffset = Math.cos(angle) * velocity;
+        const yOffset = Math.sin(angle) * velocity;
+        
+        gsap.to(note, {
+          x: xOffset,
+          y: yOffset - gsap.utils.random(40, 100),
+          rotation: gsap.utils.random(-360, 360),
+          opacity: 0,
+          scale: gsap.utils.random(0.3, 0.7),
+          duration: gsap.utils.random(1.2, 1.8),
+          ease: 'power2.out',
+          onComplete: () => {
+            note.remove();
+          }
+        });
+      }
+    });
+  }
+})();
+
 /* ---------- page transitions (fade out on click, fade in on load) ---------- */
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
   document.body.classList.add('page-ready');
